@@ -62,7 +62,7 @@ module.exports = (message,client) => {
                 //let key2 = lista[1].textContent;//xd
 
                 //Key of recent video/stream
-                if(ttl===key1) continue;
+                if(ttl===key1) return;
                 if(ttl!==key1){ 
                 ytdb.establecer(channelId, key1)
                 key = key1;
@@ -74,7 +74,6 @@ module.exports = (message,client) => {
                 //data
                 let img = "https://img.youtube.com/vi/"+key+"/maxresdefault.jpg";
                 let ltimg = "https://img.youtube.com/vi/"+key+"/mqdefault.jpg";
-                let publishdate = isodate(r.items[0].snippet.publishedAt);
                 var view = "???",timestr;
                 //Status stream
                 let stat=(r.items[0].snippet.liveBroadcastContent==="live")? "En Vivo":(r.items[0].snippet.liveBroadcastContent==="none")?"Finalizado":"En Espera";
@@ -126,7 +125,7 @@ module.exports = (message,client) => {
                     default:
                         break
                 };
-                if(stat==="Finalizado") continue;
+                if(stat==="Finalizado") return;
             
                 //Message Emmbed
                 const embed = new Discord.MessageEmbed()
