@@ -2,6 +2,9 @@ const Discord = require("discord.js");
 const config = require("../../config.json");
 const apikey = config.apikey;
 const fetch = require("node-fetch");
+var request = require("request");
+var DOMParser = new (require('xmldom')).DOMParser;
+
 var url = ["UCJePO0Zl-zZTqjpHO82RNNA",//Lia
     "UCMUmvaIF0-fBHzxt1PLOq3A",//Hana
     "UCQLyq7TDKHlmp2Ufd5Z2qMw",//Laila o gata apex
@@ -44,6 +47,7 @@ function convertMS(ms) {
 }
 
 module.exports = (message,client) => {
+    
     try {
         setInterval(async function(){
         for(i=0;i<10;i++){
@@ -51,6 +55,7 @@ module.exports = (message,client) => {
         let URL = "https://www.youtube.com/feeds/videos.xml?channel_id=" + channelId + "&q=searchterms";
         const ttl = await ytdb.obtener(channelId)//xd
         //Xml File to Json
+        var count;
         request({
             url: URL,
             json: false
@@ -89,12 +94,7 @@ module.exports = (message,client) => {
                         utcmili = date2.getTime(); 
                 
                         result=starmili-utcmili;
-                
-                        /*
-                        console.log(startime);//
-                        console.log(utc);//
-                        console.log(convertMS(result));
-                        */
+                        
                         timestr = "Faltan "+convertMS(result);
                         break
                     case "En Vivo":
@@ -108,12 +108,7 @@ module.exports = (message,client) => {
                         utcmili = date2.getTime(); 
                 
                         result=utcmili-starmili;
-                
-                        /*
-                        console.log(startime);//
-                        console.log(utc);//
-                        console.log(convertMS(result));
-                        */
+
                         timestr = "Lleva "+convertMS(result);
                         view = r.items[0].liveStreamingDetails.concurrentViewers;
                         break
@@ -149,9 +144,6 @@ module.exports = (message,client) => {
                 console.log("ERROR IN FUNCTION")
             }
         })
-        console.log(count);
-
-
     }
     }, 40000);           
     } catch(err) {
