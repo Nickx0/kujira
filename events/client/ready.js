@@ -136,7 +136,10 @@ module.exports = (message,client) => {
                     )
                     .setTimestamp()
                     .setURL("https://www.youtube.com/watch?v="+key)
-                if(message!==null){message.channels.cache.get(discChnId[i]).send(embed);}
+                if(message.channels.cache.get(discChnId[i])===null){
+                    console.log("no existe")
+                }
+                message.channels.cache.get(discChnId[i]).send(embed);
                 }
             }else{
                 console.log("ERROR IN FUNCTION")
