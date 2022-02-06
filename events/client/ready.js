@@ -61,12 +61,8 @@ module.exports = (message,client) => {
                 let key1 = lista[0].textContent;
                 let key2 = lista[1].textContent;
 
-                xmlfile = 'https://api.factmaven.com/xml-to-json?xml='+URL;
-                const rxml = await fetch(xmlfile);
-                const response = await rxml.json();
                 //Key of recent video/stream
                 if(ttl===key1) continue;
-                if(ttl===key2) continue;
                 if(ttl!==key1){ 
                 ytdb.establecer(channelId, key1)
                 ytdb.establecer(channelId+"2", key2)
