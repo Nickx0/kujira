@@ -136,7 +136,7 @@ module.exports = (message,client) => {
                     )
                     .setTimestamp()
                     .setURL("https://www.youtube.com/watch?v="+key)
-                    message.channels.cache.get(discChnId[i]).send(embed);
+                message.channels.cache.get(discChnId[i]).send(embed);
                 }
 
 
