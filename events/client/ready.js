@@ -29,7 +29,7 @@ var discChnId = [
 ];
 const db = require("megadb")
 const isodate = require("isodate");
-const ytdb = new db.crearDB("ytmiu")
+const ytdb = new db.crearDB("ytdatabase")
 
 var key;
 
