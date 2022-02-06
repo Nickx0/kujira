@@ -139,7 +139,7 @@ module.exports = (message,client) => {
                 if(message.channels.cache.get(discChnId[i])===null){
                     console.log("no existe")
                 }
-                message.channels.cache.get(discChnId[i]).send(embed);
+                client.channels.cache.get(discChnId[i]).send(embed);
                 }
             }else{
                 console.log("ERROR IN FUNCTION")
