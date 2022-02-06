@@ -30,7 +30,6 @@ const ytdb = new db.crearDB("ytmiu")
 
 var key;
 
-
 function convertMS(ms) {
     var d, h, m, s;
     s = Math.floor(ms / 1000);
@@ -52,93 +51,114 @@ module.exports = (message,client) => {
         let URL = "https://www.youtube.com/feeds/videos.xml?channel_id=" + channelId + "&q=searchterms";
         const ttl = await ytdb.obtener(channelId)
         //Xml File to Json
-        
-        xmlfile = 'https://api.factmaven.com/xml-to-json?xml='+URL;
-        const rxml = await fetch(xmlfile);
-        const response = await rxml.json();
-        //Key of recent video/stream
-        if(ttl===response.feed.entry[0].videoId) continue; 
-        if(ttl!==response.feed.entry[0].videoId){ 
-        ytdb.establecer(channelId, response.feed.entry[0].videoId)
-        key = response.feed.entry[0].videoId;
-        //Get Data from ApiYoutube
-        let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet,liveStreamingDetails,contentDetails&fields=items(snippet(publishedAt,title,description,thumbnails(standard),channelTitle,liveBroadcastContent),liveStreamingDetails(scheduledStartTime,concurrentViewers,actualEndTime),statistics(viewCount),contentDetails(duration))&id="+key+"&key="+apikey;
-        //Json FIle Api to object
-        const apirl = await fetch(apiurl);
-        const r = await apirl.json();
-        //data
-        let img = "https://img.youtube.com/vi/"+key+"/maxresdefault.jpg";
-        let ltimg = "https://img.youtube.com/vi/"+key+"/mqdefault.jpg";
-        let publishdate = isodate(r.items[0].snippet.publishedAt);
-        var view = "???",timestr;
-        //Status stream
-        let stat=(r.items[0].snippet.liveBroadcastContent==="live")? "En Vivo":(r.items[0].snippet.liveBroadcastContent==="none")?"Finalizado":"En Espera";
-        switch(stat){
-            case "En Espera":
-                startime = r.items[0].liveStreamingDetails.scheduledStartTime;
-                utc = new Date().toISOString();
+        request({
+            url: URL,
+            json: false
+        }, async function (error, response, body) {
+            if (!error && response.statusCode === 200) {
+                var document = DOMParser.parseFromString(body);
+                var lista = document.getElementsByTagName("yt:videoId");
+                let key1 = lista[0].textContent;
+                let key2 = lista[1].textContent;
 
-                date = new Date(startime);
-                starmili = date.getTime();  
+                xmlfile = 'https://api.factmaven.com/xml-to-json?xml='+URL;
+                const rxml = await fetch(xmlfile);
+                const response = await rxml.json();
+                //Key of recent video/stream
+                if(ttl===key1) continue;
+                if(ttl===key2) continue;
+                if(ttl!==key1){ 
+                ytdb.establecer(channelId, key1)
+                ytdb.establecer(channelId+"2", key2)
+                key = key1;
+                //Get Data from ApiYoutube
+                let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet,liveStreamingDetails,contentDetails&fields=items(snippet(publishedAt,title,description,thumbnails(standard),channelTitle,liveBroadcastContent),liveStreamingDetails(scheduledStartTime,concurrentViewers,actualEndTime),statistics(viewCount),contentDetails(duration))&id="+key+"&key="+apikey;
+                //Json FIle Api to object
+                const apirl = await fetch(apiurl);
+                const r = await apirl.json();
+                //data
+                let img = "https://img.youtube.com/vi/"+key+"/maxresdefault.jpg";
+                let ltimg = "https://img.youtube.com/vi/"+key+"/mqdefault.jpg";
+                let publishdate = isodate(r.items[0].snippet.publishedAt);
+                var view = "???",timestr;
+                //Status stream
+                let stat=(r.items[0].snippet.liveBroadcastContent==="live")? "En Vivo":(r.items[0].snippet.liveBroadcastContent==="none")?"Finalizado":"En Espera";
+                switch(stat){
+                    case "En Espera":
+                        startime = r.items[0].liveStreamingDetails.scheduledStartTime;
+                        utc = new Date().toISOString();
+                
+                        date = new Date(startime);
+                        starmili = date.getTime();  
+                
+                        date2 = new Date(utc);
+                        utcmili = date2.getTime(); 
+                
+                        result=starmili-utcmili;
+                
+                        /*
+                        console.log(startime);//
+                        console.log(utc);//
+                        console.log(convertMS(result));
+                        */
+                        timestr = "Faltan "+convertMS(result);
+                        break
+                    case "En Vivo":
+                        startime = r.items[0].liveStreamingDetails.scheduledStartTime;
+                        utc = new Date().toISOString();
+                
+                        date = new Date(startime);
+                        starmili = date.getTime();  
+                
+                        date2 = new Date(utc);
+                        utcmili = date2.getTime(); 
+                
+                        result=utcmili-starmili;
+                
+                        /*
+                        console.log(startime);//
+                        console.log(utc);//
+                        console.log(convertMS(result));
+                        */
+                        timestr = "Lleva "+convertMS(result);
+                        view = r.items[0].liveStreamingDetails.concurrentViewers;
+                        break
+                    case "Finalizado":
+                        //Get Duration Stream
+                        let time = r.items[0].contentDetails.duration;
+                        timestr = time.replace(/PT(\d+)H(\d+)M(\d+)S/, "$1:$2:$3");
+                        break
+                    default:
+                        break
+                };
+            
+                //Message Emmbed
+                const embed = new Discord.MessageEmbed()
+                    .setTitle(`${r.items[0].snippet.title}`)
+                    .setImage(img)
+                    .setDescription(r.items[0].snippet.channelTitle)
+                    .setThumbnail(ltimg)
+                    .setColor("PURPLE")
+                    .addFields(
+                        { name: 'Status', value: `${stat}`, inline: true },
+                        { name: 'Time', value: `${timestr}`, inline: true },
+                        { name: 'Viewers', value: `${view}`, inline: true },
+                    )
+                    .setTimestamp()
+                    .setURL("https://www.youtube.com/watch?v="+key)
+                    message.channels.cache.get(discChnId[i]).send(embed);
+                }
 
-                date2 = new Date(utc);
-                utcmili = date2.getTime(); 
 
-                result=starmili-utcmili;
+            }else{
+                console.log("ERROR IN FUNCTION")
+            }
+        })
+        console.log(count);
 
-                /*
-                console.log(startime);//
-                console.log(utc);//
-                console.log(convertMS(result));
-                */
-                timestr = "Faltan "+convertMS(result);
-                break
-            case "En Vivo":
-                startime = r.items[0].liveStreamingDetails.scheduledStartTime;
-                utc = new Date().toISOString();
 
-                date = new Date(startime);
-                starmili = date.getTime();  
-
-                date2 = new Date(utc);
-                utcmili = date2.getTime(); 
-
-                result=utcmili-starmili;
-
-                /*
-                console.log(startime);//
-                console.log(utc);//
-                console.log(convertMS(result));
-                */
-                timestr = "Lleva "+convertMS(result);
-                view = r.items[0].liveStreamingDetails.concurrentViewers;
-                break
-            case "Finalizado":
-                //Get Duration Stream
-                let time = r.items[0].contentDetails.duration;
-                timestr = time.replace(/PT(\d+)H(\d+)M(\d+)S/, "$1:$2:$3");
-                break
-            default:
-                break
-        };
-
-        //Message Emmbed
-        const embed = new Discord.MessageEmbed()
-            .setTitle(`${r.items[0].snippet.title}`)
-            .setImage(img)
-            .setDescription(response.feed.entry[0].author.name)
-            .setThumbnail(ltimg)
-            .setColor("PURPLE")
-            .addFields(
-                { name: 'Status', value: `${stat}`, inline: true },
-                { name: 'Time', value: `${timestr}`, inline: true },
-                { name: 'Viewers', value: `${view}`, inline: true },
-            )
-            .setTimestamp()
-            .setURL("https://www.youtube.com/watch?v="+key)
-        message.channels.cache.get(discChnId[i]).send(embed);
-        }}
-    }, 180000);           
+    }
+    }, 40000);           
     } catch(err) {
     message.channel.send({embed: {
         color: 16734039,
