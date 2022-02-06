@@ -49,7 +49,7 @@ module.exports = (message,client) => {
         for(i=0;i<10;i++){
         channelId = url[i];
         let URL = "https://www.youtube.com/feeds/videos.xml?channel_id=" + channelId + "&q=searchterms";
-        const ttl = await ytdb.obtener(channelId)
+        const ttl = await ytdb.obtener(channelId)//xd
         //Xml File to Json
         request({
             url: URL,
@@ -58,14 +58,13 @@ module.exports = (message,client) => {
             if (!error && response.statusCode === 200) {
                 var document = DOMParser.parseFromString(body);
                 var lista = document.getElementsByTagName("yt:videoId");
-                let key1 = lista[0].textContent;
-                let key2 = lista[1].textContent;
+                let key1 = lista[0].textContent;//xd1
+                //let key2 = lista[1].textContent;//xd
 
                 //Key of recent video/stream
                 if(ttl===key1) continue;
                 if(ttl!==key1){ 
                 ytdb.establecer(channelId, key1)
-                ytdb.establecer(channelId+"2", key2)
                 key = key1;
                 //Get Data from ApiYoutube
                 let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet,liveStreamingDetails,contentDetails&fields=items(snippet(publishedAt,title,description,thumbnails(standard),channelTitle,liveBroadcastContent),liveStreamingDetails(scheduledStartTime,concurrentViewers,actualEndTime),statistics(viewCount),contentDetails(duration))&id="+key+"&key="+apikey;
@@ -127,6 +126,7 @@ module.exports = (message,client) => {
                     default:
                         break
                 };
+                if(stat==="Finalizado") continue;
             
                 //Message Emmbed
                 const embed = new Discord.MessageEmbed()
