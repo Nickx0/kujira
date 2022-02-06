@@ -136,16 +136,14 @@ module.exports = (message,client) => {
                     )
                     .setTimestamp()
                     .setURL("https://www.youtube.com/watch?v="+key)
-                message.channels.cache.get(discChnId[i]).send(embed);
+                if(message!==null){message.channels.cache.get(discChnId[i]).send(embed);}
                 }
-
-
             }else{
                 console.log("ERROR IN FUNCTION")
             }
         })
     }
-    }, 40000);           
+    }, 20000);           
     } catch(err) {
     message.channel.send({embed: {
         color: 16734039,
