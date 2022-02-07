@@ -72,7 +72,7 @@ module.exports = (message,client) => {
         console.log(discChnId[i])
         if(ttl===key1) continue;
         if(ttl!==key1){ 
-        ytdb.establecer(channelId, key1)
+        await ytdb.establecer(channelId, key1)
         key = key1;
         //Get Data from ApiYoutube
         let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet,liveStreamingDetails,contentDetails&fields=items(snippet(publishedAt,title,description,thumbnails(standard),channelTitle,liveBroadcastContent),liveStreamingDetails(scheduledStartTime,concurrentViewers,actualEndTime),statistics(viewCount),contentDetails(duration))&id="+key+"&key="+apikey;
