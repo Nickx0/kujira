@@ -54,7 +54,7 @@ module.exports = (message,client) => {
         for(i=0;i<10;i++){
         console.log(i);
         channelId = url[i];
-        let urs = "https://www.youtube.com/feeds/videos.xml?channel_id=UCQLyq7TDKHlmp2Ufd5Z2qMw&q=searchterms";
+        let urs = "https://www.youtube.com/feeds/videos.xml?channel_id="+channelId+"&q=searchterms";
         const ttl = await ytdb.obtener(channelId)//xd
         //Xml File to Json
         await got(urs).then(response => {
