@@ -139,11 +139,11 @@ module.exports = (message,client) => {
             )
             .setTimestamp()
             .setURL("https://www.youtube.com/watch?v="+key)
-            message.channels.cache.get(discChnId[i]).send(embed);
+        await message.channels.cache.get(discChnId[i]).send(embed);
         }
 
     }
-    }, 15000);           
+    }, 25000);           
     } catch(err) {
     message.channel.send({embed: {
         color: 16734039,
