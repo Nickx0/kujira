@@ -57,7 +57,7 @@ module.exports = (message,client) => {
         let urs = "https://www.youtube.com/feeds/videos.xml?channel_id=" + channelId + "&q=searchterms";
         const ttl = await ytdb.obtener(channelId)//xd
         //Xml File to Json
-        await got(urs).then(function queso(response){
+        await got(urs).then(response=>{
             const dom = new JSDOM(response.body);
             let rvs = dom.window.document.getElementsByTagName("yt:videoId");
             vals = rvs[0].textContent;
