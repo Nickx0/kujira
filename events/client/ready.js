@@ -2,9 +2,9 @@ const Discord = require("discord.js");
 const config = require("../../config.json");
 const apikey = config.apikey;
 const fetch = require("node-fetch");
-const got = require('got');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
+const got = require("got");
 
 var url = ["UCJePO0Zl-zZTqjpHO82RNNA",//Lia
     "UCMUmvaIF0-fBHzxt1PLOq3A",//Hana
