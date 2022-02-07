@@ -142,7 +142,7 @@ module.exports = (message,client) => {
         }
 
     }
-    }, 15000);           
+    }, 20000);           
     } catch(err) {
     message.channel.send({embed: {
         color: 16734039,
