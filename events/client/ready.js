@@ -54,22 +54,22 @@ module.exports = (message,client) => {
         for(i=0;i<10;i++){
         console.log(i);
         channelId = url[i];
-        let urs = "https://www.youtube.com/feeds/videos.xml?channel_id=" + channelId + "&q=searchterms";
+        let urs = "https://www.youtube.com/feeds/videos.xml?channel_id=UCQLyq7TDKHlmp2Ufd5Z2qMw&q=searchterms";
         const ttl = await ytdb.obtener(channelId)//xd
         //Xml File to Json
-        await got(urs).then(response=>{
+        await got(urs).then(response => {
             const dom = new JSDOM(response.body);
-            let rvs = dom.window.document.getElementsByTagName("yt:videoId");
-            vals = rvs[0].textContent;
-            console.log(vals)
-        }).catch(err => {
+            console.log(dom.window.document.querySelector('title').textContent);
+            let vsg = dom.window.document.getElementsByTagName("yt:videoId");
+            vals = vsg[0].textContent;
+          }).catch(err => {
             console.log(err);
-        });
-        
+          });
         key1 = vals;//xd1
         //let key2 = lista[1].textContent;//xd
         console.log(vals)
         //Key of recent video/stream
+        console.log(discChnId[i])
         if(ttl===key1) continue;
         if(ttl!==key1){ 
         ytdb.establecer(channelId, key1)
@@ -122,6 +122,7 @@ module.exports = (message,client) => {
             default:
                 break
         };
+        
         if(stat==="Finalizado") continue;
     
         //Message Emmbed
@@ -142,7 +143,7 @@ module.exports = (message,client) => {
         }
 
     }
-    }, 20000);           
+    }, 15000);           
     } catch(err) {
     message.channel.send({embed: {
         color: 16734039,
