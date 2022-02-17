@@ -1,6 +1,7 @@
 const Discord = require("discord.js");
 const ytch = require('yt-channel-info');
-const prefix = "!";
+const config = require("../config");
+const prefix = config.prefix;
 
 function generarObjetoVtubers() {
     return {
@@ -24,6 +25,8 @@ function generarObjetoVtubers() {
         palcolor:"#FF8E9C",
         luna:"UCN3mosAMYBdogyQovOhPrxA",
         lunacolor:"#8EA9FF",
+        yue:"UCIm8pnnTNhCgGAtNxrQQv-g",
+        yuecolor:"#3FFB97",
     }
 };
 
@@ -91,6 +94,11 @@ module.exports = {
                     filtrar = {
                     channelid:generarObjetoVtubers().luna,
                     color:generarObjetoVtubers().lunacolor}
+                    break;
+                case "yue":
+                    filtrar = {
+                    channelid:generarObjetoVtubers().yue,
+                    color:generarObjetoVtubers().yuecolor}
                     break;
                 default:
                     break;

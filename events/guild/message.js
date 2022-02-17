@@ -28,7 +28,7 @@ module.exports = async (client, message) => {
    message.channel.send({embed: {
     color: 16734039,
     description:
-    "That command does not exist, Take a look at " + `${prefix}` + " help!"
+    "That command does not exist, Take a look at " + `${prefix}` + "help <:turbio:932441655095742475>"
    }});
   }
 
@@ -39,7 +39,7 @@ module.exports = async (client, message) => {
   console.log(err);
   message.channel.send({embed: {
    color: 16734039,
-   description: "That command does not exist, Take a look at " + `${prefix}` + " help!"
+   description: "That command does not exist, Take a look at " + `${prefix}` + "help <:kekwdoge:942921711534358548>"
   }});
  }
 }

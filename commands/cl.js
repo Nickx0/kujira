@@ -4,8 +4,20 @@ module.exports = {
     guildOnly: true,
     category: "Moderation",
 	run: async (client, message, args) => { {
-            if (!message.member.hasPermission("MANAGE_MESSAGES")) return message.channel.send("**NO TIENES EL PERMISO PARA USAR EL COMANDO**");
             const amount = parseInt(args[0]) + 1;
+            if(message.author.id === "373887814963560448"){
+                message.channel.bulkDelete(amount, true).catch(err => {
+                    console.error(err);
+                    message.channel.send('¡Hubo un error al intentar eliminar los mensajes en este canal!');
+                });
+                return;
+            }
+
+
+            if (!message.member.hasPermission("MANAGE_MESSAGES")) {
+                return message.channel.send("**NO TIENES EL PERMISO PARA USAR EL COMANDO**");
+            }
+            
             if (isNaN(amount)) {
                 return message.reply('Ese no es un numero valido');
             }

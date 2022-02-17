@@ -8,7 +8,7 @@ client.commands = new Discord.Collection();
 client.on('ready', () => {
     console.log(`El ${client.user.tag} esta listo`);
     client.user.setStatus('online');
-    client.user.setActivity('Arriba Chicas de Wactor :thumbsup:');
+    client.user.setActivity('Arriba Chicas de Wactor');
 })
 
 client.on('message', async message => {

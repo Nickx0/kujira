@@ -10,7 +10,7 @@ module.exports = {
   (async () => {
     var list = [
       'https://c.tenor.com/Dcdf0if-PlsAAAAC/anime-school-girl.gif',
-      'https://c.tenor.com/vDpHmAfgA6wAAAAC/cxz-spank.giff',
+      'https://c.tenor.com/vDpHmAfgA6wAAAAC/cxz-spank.gif',
       'http://pa1.narvii.com/5792/c53f613f30bd0053e1eb561d336db90f2a02ec46_hq.gif',
       'https://c.tenor.com/B5oC9lACJ9kAAAAC/anime-spank.gif',
       'https://c.tenor.com/fgxHmZDTkrcAAAAC/anime-spanking.gif',
