@@ -6,7 +6,8 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const got = require("got");
 
-var url = ["UCJePO0Zl-zZTqjpHO82RNNA",//Lia
+var url = [
+    "UCJePO0Zl-zZTqjpHO82RNNA",//Lia
     "UCMUmvaIF0-fBHzxt1PLOq3A",//Hana
     "UCQLyq7TDKHlmp2Ufd5Z2qMw",//Laila o gata apex
     "UCqTymU8oHTygrEzas_gVBFg",//Suzu
@@ -22,8 +23,14 @@ var url = ["UCJePO0Zl-zZTqjpHO82RNNA",//Lia
     "UCV1xUwfM2v2oBtT3JNvic3w",//Selen
     "UCgmPnx-EEeOrZSg5Tiw7ZRQ",//baelz
     "UCmbs8T6MWqUHP1tIQvSgKrg",//kronni
-    "UC3n5uGu18FoCy23ggWWp8tA"//mumei
-    //"UCIm8pnnTNhCgGAtNxrQQv-g"//Yue (elfa)
+    "UC3n5uGu18FoCy23ggWWp8tA",//mumei
+    "UCIm8pnnTNhCgGAtNxrQQv-g",//Yue (elfa)
+    "UCIeSUTOTkF9Hs7q3SGcO-Ow",//Elira
+    "UC4WvIIAo89_AzGUh1AZ6Dkg",//Rosemi
+    "UCgA2jKRkqpY_8eysPUs8sjw",//Petra
+    "UCkieJGn3pgJikVW8gmMXE2w",//Nina
+    "UCR6qhsLpn62WVxCBK1dkLow",//Enna
+    "UC47rNmkDcNgbOcM-2BwzJTQ"//Millie
 ];
 var discChnId = [
     "934896734625202227",
@@ -43,9 +50,15 @@ var discChnId = [
     "934929295346925709",
     "934929295346925709",
     "934929295346925709",
-    //"934897970678227005"
+    "934897970678227005",
+    "934929406592421899",
+    "934929406592421899",
+    "934929406592421899",
+    "934929406592421899",
+    "934929406592421899",
+    "934929406592421899"
 ];
-var lastid=[],lastid2=[],lastid3=[],lastid4=[],lastid5=[];
+var lastid=[],lastid2=[],lastid3=[],lastid4=[];
 const db = require("megadb")
 const ytdb = new db.crearDB("ytmiu")
 function convertMS(ms) {
@@ -60,37 +73,31 @@ function convertMS(ms) {
     h += d * 24;
     return h + ':' + m + ':' + s;
 }
-var vals,valstl,valstl2,valstl3,valstl4,valstl5;
+var vals,vals1,vals2,vals3;
 async function getLastId(urlx){
     let urs = "https://www.youtube.com/feeds/videos.xml?channel_id="+urlx+"&q=searchterms";
         //Xml File to Json
     await got(urs).then(response => {
-        const dom = new JSDOM(response.body);
+        let dom = new JSDOM(response.body);
         console.log(dom.window.document.querySelector('title').textContent);
         let vsg = dom.window.document.getElementsByTagName("yt:videoId");
-        let vsgtl = dom.window.document.getElementsByTagName("title");
+        console.log(vsg[0].textContent)
         vals = vsg[0].textContent;
-        valstl = vsgtl[1].textContent;
-        valstl2 = vsgtl[2].textContent;
-        valstl3 = vsgtl[3].textContent;
-        valstl4 = vsgtl[4].textContent;
-        valstl5 = vsgtl[5].textContent;
+        vals1 = vsg[1].textContent;
+        vals2 = vsg[2].textContent;
+        vals3 = vsg[3].textContent;
       }).catch(err => {
         console.log(err);
       });
 }
 function trueOrNot(lstid,vls){
-    if(lstid===vls)
-        return true;
-    else
-        return false;
+    return lstid===vls;
 }
-async function saveLastId(i,vals,vals2,vals3,vals4,vals5){
+async function saveLastId(i,vals,vals2,vals3,vals4){
     await ytdb.establecer(url[i], vals)
     await ytdb.establecer(url[i]+"2", vals2)
     await ytdb.establecer(url[i]+"3", vals3)
     await ytdb.establecer(url[i]+"4", vals4)
-    await ytdb.establecer(url[i]+"5", vals5)
 }
 module.exports = (message,client) => {
     
@@ -101,17 +108,15 @@ module.exports = (message,client) => {
             lastid2[i] = await ytdb.obtener(url[i]+"2")//xd
             lastid3[i] = await ytdb.obtener(url[i]+"3")//xd
             lastid4[i] = await ytdb.obtener(url[i]+"4")//xd
-            lastid5[i] = await ytdb.obtener(url[i]+"5")//xd
         }
         for(i=0;i<url.length;i++){
             await getLastId(url[i]);
-            if(trueOrNot(lastid[i],valstl)) continue;
-            else if(trueOrNot(lastid2[i],valstl)) continue;
-            else if(trueOrNot(lastid3[i],valstl)) continue;
-            else if(trueOrNot(lastid4[i],valstl)) continue;
-            else if(trueOrNot(lastid5[i],valstl)) continue;
+            if(trueOrNot(lastid[i],vals)) continue;
+            else if(trueOrNot(lastid2[i],vals)) continue;
+            else if(trueOrNot(lastid3[i],vals)) continue;
+            else if(trueOrNot(lastid4[i],vals)) continue;
             else{
-                await saveLastId(i,valstl,valstl2,valstl3,valstl4,valstl5);
+                await saveLastId(i,vals,vals1,vals2,vals3);
                 let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet,liveStreamingDetails,contentDetails&fields=items(snippet(publishedAt,title,description,thumbnails(standard),channelTitle,liveBroadcastContent),liveStreamingDetails(scheduledStartTime,concurrentViewers,actualEndTime),statistics(viewCount),contentDetails(duration))&id="+vals+"&key="+apikey;
                 //Json FIle Api to object
                 const apirl = await fetch(apiurl);
@@ -122,46 +127,10 @@ module.exports = (message,client) => {
                     let img = "https://img.youtube.com/vi/"+vals+"/maxresdefault.jpg";
                     let ltimg = "https://img.youtube.com/vi/"+vals+"/mqdefault.jpg";
                     var view = "???",timestr;
-                    switch(stat){
-                        case "En Espera":
-                            startime = r.items[0].liveStreamingDetails.scheduledStartTime;
-                            utc = new Date().toISOString();
-                    
-                            date = new Date(startime);
-                            starmili = date.getTime();  
-                    
-                            date2 = new Date(utc);
-                            utcmili = date2.getTime(); 
-                    
-                            result=starmili-utcmili;
-                            if(result>0)
-                                timestr = "Faltan "+convertMS(result);
-                            else
-                                timestr = "---"
-                            break
-                        case "En Vivo":
-                            startime = r.items[0].liveStreamingDetails.scheduledStartTime;
-                            utc = new Date().toISOString();
-                    
-                            date = new Date(startime);
-                            starmili = date.getTime();  
-                    
-                            date2 = new Date(utc);
-                            utcmili = date2.getTime(); 
-                    
-                            result=utcmili-starmili;
-                            timestr = "Lleva "+convertMS(result);
-                            view = r.items[0].liveStreamingDetails.concurrentViewers;
-                            break
-                        case "Finalizado":
-                            //Get Duration Stream
-                            let time = r.items[0].contentDetails.duration;
-                            timestr = time.replace(/PT(\d+)H(\d+)M(\d+)S/, "$1:$2:$3");
-                            break
-                        default:
-                            break
-                    };   
-                     
+                    startime = r.items[0].liveStreamingDetails.scheduledStartTime;
+                    date = new Date(startime);
+                    starmili = date.getTime();
+                    timestr = (stat==="En Espera")? `Inicia <t:${starmili/1000}:R>` :`Empezo <t:${starmili/1000}:R>`;
                     //Message Emmbed
                     const embed = new Discord.MessageEmbed()
                         .setTitle(`${r.items[0].snippet.title}`)

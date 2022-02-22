@@ -11,7 +11,7 @@ module.exports = async (client, message) => {
    const embed = new Discord.MessageEmbed()
     .setTitle(`<a:sucess:759354039242063903> Hi!`, message.guild.iconURL())
     .setColor('RANDOM')
-    .setDescription("I was pinged by you, here I am - " + client.user.username + "! My prefix is \`" + prefix + "\` To see all  my commands please type \`" + prefix + " help\`")
+    .setDescription("I was pinged by you, here I am - " + client.user.username + "! My prefix is \`" + prefix + "\` To see all  my commands please type \`" + prefix + "help\`")
     .setTimestamp()
     .setFooter("Requested by " + `${message.author.username}`, message.author.displayAvatarURL({ dynamic: true, format: 'png', size: 2048 }))
    message.channel.send(embed);
