@@ -44,7 +44,9 @@ module.exports = {
 
         if(idVideo!==""||idVideo!==false) return
         let tagDB = new db.crearDB(`mega_databases/${idVideo}.json`)
-        tagDB.map(false, (seg,tag) => `[${convertMS(seg)}](www.youtube.com/watch?v=${idVideo}&t=${seg}) `
+        tags = tagDB.map(false, (seg,tag) => `[${convertMS(seg)}](www.youtube.com/watch?v=${idVideo}&t=${seg}) ${tag}`).then(datos => {
+            return console.log(datos.join("\n"))
+        })
     } catch (err) {
         console.log(err)
     }
