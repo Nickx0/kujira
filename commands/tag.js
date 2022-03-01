@@ -1,22 +1,16 @@
 const Discord = require('discord.js');
-const data = require("../shared-data.json");
 const fetch = require("node-fetch");
+const config = require("../config.json");
 const db = require("megadb");
-const fs = require('fs');
-var request = require("request");
-
-const vtuberChannelId = data.vtuberChannelId
-const discordChannelId = data.discordChannelId
-//const tagDb = new db.crearDB("tags")
-
-//const ytdb = new db.crearDB("X")
-function matchYoutubeUrl(url) {
-    var p = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
-    if(url.match(p)){
-        return url.match(p)[1];
-    }
-    return false;
-}
+const apikey = config.apikey;
+const pool = require('../db-connection.js');
+/*function convertMS(ms) {
+    var duracion = new Date(ms)
+        var horas = duracion.getHours()
+        var minutos = duracion.getMinutes()
+        var segundos = duracion.getSeconds()
+        return ((horas<10)?'0'+horas:horas)+':'+((minutos<10)?'0'+minutos:minutos)+':'+((segundos<10)?'0'+segundos:segundos)
+}*/
 
 module.exports = {
     name: "t",
@@ -24,53 +18,48 @@ module.exports = {
     category: "Utility",
     run: async (client, message, args) => {
     (async () => {
-    try {
-       var channel = message.channel.id//get ID from the channel
-       if(args[0]==="start"){
-            
-            url = matchYoutubeUrl(args[1]);
-            console.log(url)
-            if (url===false) return message.channel.send("NO ES UN LINK DE YOUTUBE");
-            idx = discordChannelId.indexOf(channel)//get idx of channel
-            console.log(idx)
+    try {  
+        let channel = message.channel.id;
+        let callvtuberkey = `select a.canal_alerta_key,v.id_vtuber
+        from canal_alerta a 
+        inner join vtuberlist v
+        on a.id_canal_alerta = v.id_canal_alerta
+        Where a.canal_alerta_key = '${channel}'`;
+        let key = await pool.query(callvtuberkey);
+        let selId_vtuber = `SELECT * FROM Pjt3W34Qzv.video WHERE id_vtuber='${key[0].id_vtuber}' ORDER BY id_videos DESC`
+        let urlvideos = await pool.query(selId_vtuber);
+        let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(liveBroadcastContent),liveStreamingDetails(actualStartTime))&id="+urlvideos[0].id_video+"&key="+apikey;
+        //Json FIle Api to object
+        const apirl = await fetch(apiurl);
+        const r = await apirl.json();
+        stat=r.items[0].snippet.liveBroadcastContent;
 
-            var r = request.get(`https://www.youtube.com/channel/${vtuberChannelId[idx]}/live`,function(e,response,body){//get vtuber youtube channel from index
-                console.log(r.uri.href)
-                console.log(response.headers)
-                //console.log(body)
-            })
-            //console.log(r)
-            //`https://www.youtube.com/channel/${vtuberChannelId[idx]}/live`
-            //lastUrl = await fetch(`https://www.youtube.com/channel/${vtuberChannelId[idx]}/live`);//getting last url video from channel
-            //console.log(lastUrl)
-            //lastUrl = matchYoutubeUrl(lastUrl)
-            /*if(lastUrl!==false)
+        if(stat==="live"){
+            offset = 5;
+            tag = ""
+            if(!args[0].isNaN())
             {
-                console.log(lastUrl)
-                return message.channel.send(lastUrl);
+                offset = args[0]
+                tag = args.slice(1,args.length).join(" ")
+            }else{
+                tag = args.join(" ")
             }
-            if(url===lasturl){
-                if(tagDb.tiene(url,{ChannelID:vtuberChannelId[idx],discordChannelId:channel.ChannelID})){
-                    tagDb.establecer(url,[])
-                }else{
-                    message.channel.send("El stream ya ha sido configurado")
-                }
-            }*/
-
-        }else if(args[0]==="give"){
-        }
-        else if(args[0]==="tags"){
-            url = matchYoutubeUrl(args[1]);
-            console.log(url);
-            console.log(channel+url);
-            let rawdata = fs.readFileSync(`mega_databases/${channel+url}.json`);
-            let student = JSON.parse(rawdata);
-            console.log(student);
-            const embed = new Discord.MessageEmbed()
-                .setColor('#1BC1D5')
-                .setDescription(`**${message.author}** PIDIO LOS TAGS`)
-                .setAuthor(message.author.tag, avatar);
-            return message.channel.send(embed);
+            startime = r.items[0].liveStreamingDetails.actualStartTime;
+            utc = new Date().toISOString();
+    
+            date = new Date(startime);
+            starmili = date.getTime();  
+    
+            date2 = new Date(utc);
+            utcmili = date2.getTime(); 
+    
+            result=utcmili-starmili;
+    
+            tagTime = result-offset;
+            let tag = new db.crearDB(`mega_databases/${urlvideos[0].id_video}.json`)
+            tag.establecer(tagtime,tag)
+        } else {
+            message.channel.send("No esta en vivo ahora...");
         }
     } catch (err) {
         console.log(err)
