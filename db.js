@@ -1,10 +1,15 @@
-/*const mysql = require("mysql")
-var connection = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "kujira"
+const mysql = require("mysql")
+const database = require('./config.json').database;
+let connection = mysql.createConnection({
+    host: database.host,
+    user: database.username,
+    password: database.password,
+    database: database.name,
+    port: database.port
 });
+
+
+
 connection.connect(function (err, db) {
     if(!!err){
         console.log("Error")
@@ -12,7 +17,7 @@ connection.connect(function (err, db) {
         console.log("Connect")
     }
 });
-connection.query("SELECT * FROM kujira.vtuberlist",function (err,row,fields) {
+connection.query("SELECT * FROM vtuberlist",function (err,row,fields) {
     if(!!err){
         console.log("Error in consulte")
     }else{
@@ -20,6 +25,8 @@ connection.query("SELECT * FROM kujira.vtuberlist",function (err,row,fields) {
         console.log(row)
     }
 })
+module.exports = connection
+
 module.exports = (connection) => {
     try {
         function row (){
@@ -28,4 +35,4 @@ module.exports = (connection) => {
     } catch (err) {
 
     }
-}*/
+}
