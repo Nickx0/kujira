@@ -55,7 +55,6 @@ module.exports = {
                 }else{
                     message.channel.send("El stream ya ha sido configurado")
                 }
-
             }*/
 
         }else if(args[0]==="give"){
