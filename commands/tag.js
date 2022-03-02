@@ -33,11 +33,11 @@ module.exports = {
         const apirl = await fetch(apiurl);
         const r = await apirl.json();
         stat=r.items[0].snippet.liveBroadcastContent;
-
         if(stat==="live"){
-            offset = 5;
-            tag = ""
-            if(!args[0].isNaN())
+            offset = 5
+            let tag = ""
+            if(args.length===0) return
+            if(!isNaN(args[0]))
             {
                 offset = args[0]
                 tag = args.slice(1,args.length).join(" ")
@@ -54,10 +54,20 @@ module.exports = {
             utcmili = date2.getTime(); 
     
             result=utcmili-starmili;
-    
-            tagTime = result-offset;
-            let tag = new db.crearDB(`mega_databases/${urlvideos[0].id_video}.json`)
-            tag.establecer(tagtime,tag)
+            console.log(offset)
+            tagTime = ((result/1000).toFixed())-offset;
+            let tags = new db.crearDB(`${urlvideos[0].id_video}`)
+            if(tags.tiene(tag)){
+                for(i=1;;i++){
+                    if(!tags.tiene(tag+`(${i})`)){
+                        tags.establecer(tag+`(${i})`,tagTime)
+                        return
+                    }
+                }
+            }else{
+                tags.establecer(tag,tagTime)
+            }
+            
         } else {
             message.channel.send("No esta en vivo ahora...");
         }

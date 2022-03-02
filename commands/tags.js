@@ -42,10 +42,17 @@ module.exports = {
             idVideo = urlvideos[0].id_video
         }       
 
-        if(idVideo!==""||idVideo!==false) return
-        let tagDB = new db.crearDB(`mega_databases/${idVideo}.json`)
-        tags = tagDB.map(false, (seg,tag) => `[${convertMS(seg)}](www.youtube.com/watch?v=${idVideo}&t=${seg}) ${tag}`).then(datos => {
-            return console.log(datos.join("\n"))
+        if(idVideo===""||idVideo===false) return
+        let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(channelTitle,liveBroadcastContent),liveStreamingDetails(actualStartTime))&id="+idVideo+"&key="+apikey;
+        //Json FIle Api to object
+        const apirl = await fetch(apiurl);
+        const r = await apirl.json();
+        let tagDB = new db.crearDB(idVideo)
+        tags = tagDB.map(false, (seg,tag) => `[${convertMS(seg*1000)}](www.youtube.com/watch?v=${idVideo}&t=${seg}) ${tag}`).then(datos => {
+            const embed = new Discord.MessageEmbed()
+            .setTitle(`Tags de ${r.items[0].snippet.channelTitle}`)
+            .setDescription(`www.youtube.com/watch?v=${idVideo}\nHora de inicio: <t:${new Date(r.items[0].liveStreamingDetails.actualStartTime).getTime()/1000}:R>\nTags:${datos.length}`+datos.join("\n"))//.toString("%H:%M:%S (JST) %a %d/%m/%Y")
+            return message.channel.send(embed);
         })
     } catch (err) {
         console.log(err)
