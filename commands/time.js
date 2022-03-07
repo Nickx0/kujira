@@ -25,31 +25,23 @@ module.exports = {
         on a.id_canal_alerta = v.id_canal_alerta
         Where a.canal_alerta_key = '${channel}'`;
         let key = await pool.query(callvtuberkey);
-        let selId_vtuber = `SELECT * FROM Pjt3W34Qzv.video WHERE id_vtuber='${key[0].id_vtuber}' ORDER BY id_videos DESC`
+        let selId_vtuber = `SELECT * FROM Pjt3W34Qzv.video WHERE id_vtuber=${key[0].id_vtuber} and estado = 1;`;
         let urlvideos = await pool.query(selId_vtuber);
+        console.log(urlvideos);
+        if(urlvideos.length==0) return message.channel.send("No esta en vivo ahora...");  
         let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(liveBroadcastContent),liveStreamingDetails(actualStartTime))&id="+urlvideos[0].id_video+"&key="+apikey;
-        //Json FIle Api to object
         const apirl = await fetch(apiurl);
         const r = await apirl.json();
-        stat=r.items[0].snippet.liveBroadcastContent;
-        if(stat==="live"){
-            startime = r.items[0].liveStreamingDetails.actualStartTime;
-            utc = new Date().toISOString();
-    
-            date = new Date(startime);
-            starmili = date.getTime();  
-    
-            date2 = new Date(utc);
-            utcmili = date2.getTime(); 
-    
-            result=utcmili-starmili;
-    
-            timestr = "Lleva "+convertMS(result);
-    
-            message.channel.send(timestr);
-        } else {
-            message.channel.send("No esta en vivo ahora...");
-        }
+        if(r.items.length==0) return message.channel.send("No esta en vivo ahora...");
+        startime = r.items[0].liveStreamingDetails.actualStartTime;
+        utc = new Date().toISOString();
+        date = new Date(startime);
+        starmili = date.getTime();  
+        date2 = new Date(utc);
+        utcmili = date2.getTime(); 
+        result=utcmili-starmili;
+        timestr = "Lleva "+convertMS(result);
+        message.channel.send(timestr);
     } catch (err) {
         console.log(err)
     }

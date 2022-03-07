@@ -5,11 +5,16 @@ const db = require("megadb");
 const apikey = config.apikey;
 const pool = require('../db-connection.js');
 function convertMS(ms) {
-    var duracion = new Date(ms)
-        var horas = duracion.getHours()
-        var minutos = duracion.getMinutes()
-        var segundos = duracion.getSeconds()
-        return ((horas<10)?'0'+horas:horas)+':'+((minutos<10)?'0'+minutos:minutos)+':'+((segundos<10)?'0'+segundos:segundos)
+    var d, h, m, s;
+    s = Math.floor(ms / 1000);
+    m = Math.floor(s / 60);
+    s = s % 60;
+    h = Math.floor(m / 60);
+    m = m % 60;
+    d = Math.floor(h / 24);
+    h = h % 24;
+    h += d * 24;
+    return ((h<10)?'0'+h:h)+':'+((m<10)?'0'+m:m)+':'+((s<10)?'0'+s:s);
 }
 
 function verifyURL(url) {
@@ -37,7 +42,7 @@ module.exports = {
             on a.id_canal_alerta = v.id_canal_alerta
             Where a.canal_alerta_key = '${channel}'`;
             let key = await pool.query(callvtuberkey);
-            let selId_vtuber = `SELECT * FROM Pjt3W34Qzv.video WHERE id_vtuber='${key[0].id_vtuber}' ORDER BY id_videos DESC`
+            let selId_vtuber = `SELECT * FROM Pjt3W34Qzv.video WHERE id_vtuber='${key[0].id_vtuber}' and estado=1`
             let urlvideos = await pool.query(selId_vtuber);
             idVideo = urlvideos[0].id_video
         }       

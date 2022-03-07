@@ -1,14 +1,15 @@
 const Discord = require('discord.js');
-const { prefix, token } = require('./config.json');
+const { prefix, token, apikey2 } = require('./config.json');
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
-
+const pool = require('./db-connection.js');
+const fetch = require("node-fetch");
 //https://www.googleapis.com/youtube/v3/activities?part=snippet,contentDetails&channelId=UC6tSB9TnO0f01OBeo9UEJZA&key=AIzaSyCsOFf7mrrPNTPuB65VoyQpcTdIgBfuB9Q&maxResults=5
 
-client.on('ready', () => {
+client.on('ready', message => {
     console.log(`El ${client.user.tag} esta listo`);
     client.user.setStatus('online');
-    client.user.setActivity('Arriba Chicas de Wactor');
+    client.user.setActivity('Arriba Chicas de Wactor'); 
 })
 
 client.on('message', async message => {

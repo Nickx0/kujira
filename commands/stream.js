@@ -51,7 +51,7 @@ module.exports = {
                 description: "URL INVALIDA"
             }})
         };
-        let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet,liveStreamingDetails,contentDetails&fields=items(snippet(publishedAt,title,description,thumbnails(standard),channelTitle,liveBroadcastContent),liveStreamingDetails(scheduledStartTime,concurrentViewers,actualEndTime),statistics(viewCount),contentDetails(duration))&id="+IdUrl+"&key="+apikey;
+        let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet,liveStreamingDetails,contentDetails&fields=items(snippet(title,channelTitle,liveBroadcastContent),liveStreamingDetails(scheduledStartTime,concurrentViewers),statistics(viewCount),contentDetails(duration))&id="+IdUrl+"&key="+apikey;
         //Json FIle Api to object
         const apirl = await fetch(apiurl);
         const r = await apirl.json();

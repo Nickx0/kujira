@@ -43,7 +43,6 @@ module.exports = {
             const args = message.content.slice(prefix.length+6).trim().split(/ +/g);       
             const texto = args.join(' ');
             if(!texto) return message.channel.send('Por favor, escribe el nombre de una vtuber');
-            console.log(texto);
             switch(texto){
                 case "lia":
                     filtrar = {
@@ -103,7 +102,6 @@ module.exports = {
                 default:
                     break;
             }
-            console.log(filtrar.channelid);
             ytch.getChannelInfo(filtrar.channelid).then((response) => {
             const embed = new Discord.MessageEmbed()
                 .setTitle(`${response.author}`, message.guild.iconURL({ dynamic: true, format: 'png'}))
