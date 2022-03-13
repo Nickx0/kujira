@@ -20,7 +20,7 @@ module.exports = {
                 var empresa = 0; 
                 key.forEach(element => {
                     if(empresa!==element.id_empresa){
-                        vtLst+=`\n**${element.empresa}**${element.logo_dc}\n`;
+                        vtLst+=`\n**${element.empresa}** ${element.logo_dc}\n`;
                         empresa = element.id_empresa;
                     }
                     vtLst+=` > ${element.nombre}\n`

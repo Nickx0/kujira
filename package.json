@@ -41,6 +41,7 @@
     "util": "^0.12.4",
     "xml2js": "^0.4.23",
     "xmldom": "^0.6.0",
+    "youtube-live-chat": "^1.0.3",
     "yt-channel-info": "^2.2.0",
     "ytdl-core": "^4.5.0"
   },
