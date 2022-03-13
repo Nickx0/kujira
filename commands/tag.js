@@ -1,17 +1,12 @@
 const Discord = require('discord.js');
 const fetch = require("node-fetch");
 const config = require("../config.json");
+const {datadb} = require('../mongodb.js');
 const db = require("megadb");
 const apikey = config.apikey;
 const pool = require('../db-connection.js');
-/*function convertMS(ms) {
-    var duracion = new Date(ms)
-        var horas = duracion.getHours()
-        var minutos = duracion.getMinutes()
-        var segundos = duracion.getSeconds()
-        return ((horas<10)?'0'+horas:horas)+':'+((minutos<10)?'0'+minutos:minutos)+':'+((segundos<10)?'0'+segundos:segundos)
-}*/
-
+const {MongoClient} = require('mongodb');
+var mongoclient = new MongoClient(datadb.uri);
 module.exports = {
     name: "t",
     description: "tags para streams",
@@ -19,6 +14,9 @@ module.exports = {
     run: async (client, message, args) => {
     (async () => {
     try {  
+        await mongoclient.connect();
+        const database = mongoclient.db('kujirabot');
+        const Url = database.collection('Url');
         let channel = message.channel.id;
         let callvtuberkey = `select a.canal_alerta_key,v.id_vtuber
         from canal_alerta a 
@@ -29,10 +27,11 @@ module.exports = {
         let selId_vtuber = `SELECT * FROM Pjt3W34Qzv.video WHERE id_vtuber='${key[0].id_vtuber}' and estado=1`
         let urlvideos = await pool.query(selId_vtuber);
         if(urlvideos.length===0) return message.channel.send("No esta en vivo ahora...");
-        let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(liveBroadcastContent),liveStreamingDetails(actualStartTime))&id="+urlvideos[0].id_video+"&key="+apikey;
+        let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(title,liveBroadcastContent),liveStreamingDetails(actualStartTime))&id="+urlvideos[0].id_video+"&key="+apikey;
         //Json FIle Api to object
         const apirl = await fetch(apiurl);
         const r = await apirl.json();
+        const query = { _id: `${urlvideos[0].id_video}`,titulo:`${r.items[0].snippet.title}`};
         offset = 5;
         let tag = "";
         if(args.length===0) return message.channel.send("Coloca un tag...");
@@ -55,17 +54,15 @@ module.exports = {
         result=utcmili-starmili;
         console.log(offset);
         tagTime = ((result/1000).toFixed())-offset;
-        let tags = new db.crearDB(`${urlvideos[0].id_video}`)
-        if(tags.tiene(tag)){
-            for(i=1;;i++){
-                if(!tags.tiene(tag+`(${i})`)){
-                    tags.establecer(tag+`(${i})`,tagTime);
-                    return;
-                }
-            }
-        }else{
-            tags.establecer(tag,tagTime);
+        try {
+            await Url.insertOne(query);
+        } catch (error) {
+            Url.updateOne(
+                { _id: `${urlvideos[0].id_video}` },
+                { $push: { tag: `${tag}`,segundo:`${tagTime}` } }
+        )
         }
+        message.react('👌');
     } catch (err) {
         console.log(err);
     }

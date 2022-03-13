@@ -2,8 +2,11 @@ const Discord = require('discord.js');
 const fetch = require("node-fetch");
 const config = require("../config.json");
 const db = require("megadb");
+const {datadb} = require('../mongodb.js');
 const apikey = config.apikey;
 const pool = require('../db-connection.js');
+const {MongoClient} = require('mongodb');
+var mongoclient = new MongoClient(datadb.uri);
 function convertMS(ms) {
     var d, h, m, s;
     s = Math.floor(ms / 1000);
@@ -32,6 +35,9 @@ module.exports = {
     run: async (client, message, args) => {
     (async () => {
     try {
+        await mongoclient.connect();
+        const database = mongoclient.db('kujirabot');
+        const Url = database.collection('Url');
         idVideo = ""
         if(args.length !== 0) {idVideo = verifyURL(args[0])}
         if(args.length === 0) {
@@ -52,14 +58,28 @@ module.exports = {
         //Json FIle Api to object
         const apirl = await fetch(apiurl);
         const r = await apirl.json();
-        let tagDB = new db.crearDB(idVideo)
-        tags = tagDB.map(false, (seg,tag) => `[${convertMS(seg*1000)}](www.youtube.com/watch?v=${idVideo}&t=${seg}) ${tag}`).then(datos => {
-            const embed = new Discord.MessageEmbed()
+        dataVideo = await Url.findOne( { _id: `${idVideo}` } )
+        console.log(dataVideo);
+        var descriptiontag = `[${dataVideo.titulo}](https://www.youtube.com/watch?v=${idVideo})\nHora de inicio: <t:${new Date(r.items[0].liveStreamingDetails.actualStartTime).getTime()/1000}:R>\nTags : ${dataVideo.segundo.length}\n`
+        console.log(dataVideo.segundo.length);
+        console.log(descriptiontag.lenght);
+        for(i=0;i<dataVideo.segundo.length;i++){
+            descriptiontag +=`[${convertMS(dataVideo.segundo[i]*1000)}](https://www.youtube.com/watch?v=${idVideo}&t=${dataVideo.segundo[i]}) : ${dataVideo.tag[i]} \n`;
+            if(descriptiontag.length>3000){
+                const embed = new Discord.MessageEmbed()
+                .setTitle(`Tags de ${r.items[0].snippet.channelTitle}`)
+                .setDescription(descriptiontag);
+                message.channel.send(embed);
+                descriptiontag ='';
+            }
+        };
+        if(descriptiontag==='') return;
+        const embed = new Discord.MessageEmbed()
             .setTitle(`Tags de ${r.items[0].snippet.channelTitle}`)
-            .setDescription(`www.youtube.com/watch?v=${idVideo}\nHora de inicio: <t:${new Date(r.items[0].liveStreamingDetails.actualStartTime).getTime()/1000}:R>\nTags:${datos.length}`+datos.join("\n"))//.toString("%H:%M:%S (JST) %a %d/%m/%Y")
-            return message.channel.send(embed);
-        })
+            .setDescription(descriptiontag);
+        message.channel.send(embed);
+        
     } catch (err) {
-        console.log(err)
+        console.log(err)    
     }
 })();}}

@@ -88,8 +88,7 @@ module.exports = async(message,client) => {
                 if(bd[i].estado!==estado){
                     let up_estado=`UPDATE Pjt3W34Qzv.video SET estado = ${estado} WHERE id_videos = ${bd[i].id_videos};`; 
                     await pool.query(up_estado);
-                    
-                    if(estado===1){
+                    if(estado===1 && bd[i].estado!==estado){
                         let apixurl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(title,channelTitle,liveBroadcastContent),liveStreamingDetails(actualStartTime,concurrentViewers))&id="+bd[i].id_video+"&key="+apikey2;
                         let luapi = await fetch(apixurl);
                         let respon = await luapi.json();

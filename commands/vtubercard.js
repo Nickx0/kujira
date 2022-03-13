@@ -1,126 +1,67 @@
 const Discord = require("discord.js");
 const ytch = require('yt-channel-info');
-const config = require("../config");
-const prefix = config.prefix;
-
-function generarObjetoVtubers() {
-    return {
-        lia:"UCJePO0Zl-zZTqjpHO82RNNA",
-        liacolor:"#F196AF",
-        hana:"UCMUmvaIF0-fBHzxt1PLOq3A",
-        hanacolor:"#FFBED0",
-        laila:"UCFSkExeBcqI4nb_ArHeByNw",
-        lailacolor:"#D56FFF",
-        suzu:"UCqTymU8oHTygrEzas_gVBFg",
-        suzucolor:"#838383",
-        hina:"UC6tSB9TnO0f01OBeo9UEJZA",
-        hinacolor:"#366BC2",
-        rose:"UCNJwC2OjJ0Hsc2HT1D6jmJw",
-        rosecolor:"#FF00FF",
-        miu:"UCM6iy_rSgSMbFjx10Z6VVGA",
-        miucolor:"#6CFF90",
-        himari:"UCAx0YWXJgyvXx5oDvrDaN_A",
-        himaricolor:"#D38EFF",
-        pal:"UCQdqGzhc5Ey_5nh_bOowAhg",
-        palcolor:"#FF8E9C",
-        luna:"UCN3mosAMYBdogyQovOhPrxA",
-        lunacolor:"#8EA9FF",
-        yue:"UCIm8pnnTNhCgGAtNxrQQv-g",
-        yuecolor:"#3FFB97",
-    }
-};
+const pool = require('../db-connection.js');
 
 module.exports = {
-    name: "vtube",
+    name: "vtuber",
     description: "Tarjeta vtubers",
     category: "Vtuber",
     usage: "nya",
     run: async (client, message, args) => {
         (async () => {
         try {
-            if (!message.content.startsWith(prefix)) return; 
             if (message.author.bot) return;
-            const args = message.content.slice(prefix.length+6).trim().split(/ +/g);       
-            const texto = args.join(' ');
-            if(!texto) return message.channel.send('Por favor, escribe el nombre de una vtuber');
-            switch(texto){
-                case "lia":
-                    filtrar = {
-                    channelid:generarObjetoVtubers().lia,
-                    color:generarObjetoVtubers().liacolor}
-                    break;
-                case "hana":
-                    filtrar = {
-                    channelid:generarObjetoVtubers().hana,
-                    color:generarObjetoVtubers().hanacolor}
-                    break;
-                case "laila":
-                    filtrar = {
-                    channelid:generarObjetoVtubers().laila,
-                    color:generarObjetoVtubers().lailacolor}
-                    break;
-                case "suzu":
-                    filtrar = {
-                    channelid:generarObjetoVtubers().suzu,
-                    color:generarObjetoVtubers().suzucolor}
-                    break;
-                case "hina":
-                    filtrar = {
-                    channelid:generarObjetoVtubers().hina,
-                    color:generarObjetoVtubers().hinacolor}
-                    break;
-                case "rose":
-                    filtrar = {
-                    channelid:generarObjetoVtubers().rose,
-                    color:generarObjetoVtubers().rosecolor}
-                    break;
-                case "miu":
-                    filtrar = {
-                    channelid:generarObjetoVtubers().miu,
-                    color:generarObjetoVtubers().miucolor}
-                    break;
-                case "himari":
-                    filtrar = {
-                    channelid:generarObjetoVtubers().himari,
-                    color:generarObjetoVtubers().himaricolor}
-                    break;
-                case "pal":
-                    filtrar = {
-                    channelid:generarObjetoVtubers().pal,
-                    color:generarObjetoVtubers().palcolor}
-                    break;
-                case "luna":
-                    filtrar = {
-                    channelid:generarObjetoVtubers().luna,
-                    color:generarObjetoVtubers().lunacolor}
-                    break;
-                case "yue":
-                    filtrar = {
-                    channelid:generarObjetoVtubers().yue,
-                    color:generarObjetoVtubers().yuecolor}
-                    break;
-                default:
-                    break;
-            }
-            ytch.getChannelInfo(filtrar.channelid).then((response) => {
-            const embed = new Discord.MessageEmbed()
-                .setTitle(`${response.author}`, message.guild.iconURL({ dynamic: true, format: 'png'}))
-                .setImage(response.authorBanners[0].url)
-                .setThumbnail(response.authorThumbnails[2].url)
-                .setDescription((response.subscriberCount)/1000+"K Suscriptores")
-                .setColor(filtrar.color)
-                .setFooter("Comando realizado por " + `${message.author.username}`, message.author.displayAvatarURL({ dynamic: true, format: 'png', size: 2048 }))
-                .setTimestamp("xd")
-                .setURL(response.authorUrl);
+            const texto = args.join('');
+            console.log(texto);
+            if(texto===''){
+                callvtuberlist='SELECT e.id_empresa,v.nombre,e.logo_dc,e.nombre as empresa FROM Pjt3W34Qzv.empresa e inner join Pjt3W34Qzv.vtuberlist v on v.id_empresa=e.id_empresa ORDER BY e.id_empresa;'
+                var vtLst='';
+                let key = await pool.query(callvtuberlist);
+                var empresa = 0; 
+                key.forEach(element => {
+                    if(empresa!==element.id_empresa){
+                        vtLst+=`\n**${element.empresa}**${element.logo_dc}\n`;
+                        empresa = element.id_empresa;
+                    }
+                    vtLst+=` > ${element.nombre}\n`
+                });
+                const embed = new Discord.MessageEmbed()
+                .setTitle(`Vtuber En Lista`)
+                .setDescription(vtLst)
+                .setFooter("Requested by " + `${message.author.username}` + " • (＼( ^o^ )／)", message.author.displayAvatarURL({ dynamic: true, format: 'png', size: 2048 }))
+                .setTimestamp()
                 message.channel.send(embed);
-            }).catch((err) => {
-                console.error(err);
-                message.channel.send({embed: {
-                    color: 16734039,
-                    description: "Algo salio mal...:"
-                }})
-            })
-        
+            }
+            else{
+                uniqevt = `SELECT v.nombre,v.channelid,v.twitter,c.value_color,e.nombre as empresa,e.logo FROM Pjt3W34Qzv.vtuberlist v inner join Pjt3W34Qzv.colores c on c.id_color=v.id_color inner join Pjt3W34Qzv.empresa e on e.id_empresa=v.id_empresa where v.nombre like '%${texto}%'`;
+                console.log(texto);
+                let keyvt = await pool.query(uniqevt);
+                if(keyvt.length==0) return message.channel.send("Esa vtuber no existe o lo escribiste mal, usa solo una parte de su nombre...");
+                console.log(keyvt[0])
+                ytch.getChannelInfo(keyvt[0].channelid).then((response) => {
+                    const embed = new Discord.MessageEmbed()
+                        .setTitle(`${response.author}`, message.guild.iconURL({ dynamic: true, format: 'png'}))
+                        .setImage(response.authorBanners[0].url)
+                        .setThumbnail(keyvt[0].logo)
+                        .setDescription(`${(response.subscriberCount)/1000}K Suscriptores`)
+                        .setColor(keyvt[0].value_color)
+                        .addFields(
+                            { name: '<:gatoem:952335362624208956>Empresa', value: `${keyvt[0].empresa}`, inline: true },
+                            { name: '<:twitter:952335362028613632>Twitter', value: `[Cuenta](${keyvt[0].twitter} 'optional hovertext')` , inline: true },
+                            { name: '<:yt:952335362192187452>Youtube', value: `[Canal](https://www.youtube.com/channel/${keyvt[0].channelid} 'optional hovertext')` , inline: true },
+                        )
+                        .setFooter("Comando realizado por " + `${message.author.username}`, message.author.displayAvatarURL({ dynamic: true, format: 'png', size: 2048 }))
+                        .setTimestamp()
+                        .setURL(response.authorUrl);
+                        message.channel.send(embed);
+                    }).catch((err) => {
+                        console.error(err);
+                        message.channel.send({embed: {
+                            color: 16734039,
+                            description: "Algo salio mal...:"
+                        }})
+                    })
+            }
             } catch(err) {
                 console.log(err)
             message.channel.send({embed: {
