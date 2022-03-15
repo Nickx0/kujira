@@ -1,12 +1,11 @@
 const Discord = require('discord.js');
 const fetch = require("node-fetch");
-const config = require("../config.json");
-const apikey = config.apikey3;
 const pool = require('../db-connection.js');
-const YouTube = require('youtube-live-chat');
+const { LiveChat } = require("youtube-chat")
 const tlTextES = /^\[es\]|\[esp\]|\(es\)\(esp\)$/
 const tlTextEN= /^\[en\]|\(en\)$/
 const tlTextJP = /^\[jp\]|\(jp\)$/
+//const tlTextEsEx = /^ES\:|Es\:|Esp\:|ESP\:$/
 
 module.exports = {
     name: "tlcollector",
@@ -22,42 +21,59 @@ module.exports = {
         on a.id_canal_alerta = v.id_canal_alerta
         Where a.canal_alerta_key = '${channel}'`;
         let yTchannel = await pool.query(query);
-        let yt = new YouTube(yTchannel[0].channelid, apikey);
+        const liveChat = new LiveChat({channelId: yTchannel[0].channelid})
         query = `SELECT e.logo_dc,v.channelid FROM Pjt3W34Qzv.empresa e 
         inner join Pjt3W34Qzv.vtuberlist v on v.id_empresa=e.id_empresa`;
         let channelids = await pool.query(query);
-        
-        yt.on('ready', () => {
-            message.channel.send('Listo para recoger las traducciones!')
-            yt.listen(8000)
-          })
-           
-        yt.on('message', data => {
+        liveChat.on("start", (liveId) => {
+          message.channel.send('Listo para recoger las traducciones!')
+        })
+        liveChat.on("chat", (chatItem) => {
+          let message = ""
           let text = ""
-          if(data.snippet.displayMessage.toLowerCase().match(tlTextES)){
-            text += `:flag_ea: ||${data.authorDetails.displayName}||: `
+          //console.log(chatItem)
+          chatItem.message.forEach(element => {
+            message += (element.isCustomEmoji) ? (element.emojiText):((element.text) ? (element.text) : (element.emojiText))
+          });
+          if(message.toLowerCase().match(tlTextES)){
+            text += `:flag_ea: ||${chatItem.author.name}||: `
           }
-          if(data.snippet.displayMessage.toLowerCase().match(tlTextEN)){
-            text += `:flag_gb: ||${data.authorDetails.displayName}||: `
+          if(message.starWith("Es:")||chatItem.message.starWith("ES:")||message.starWith("Esp:")||message.starWith("ESP:")){
+            text += `:flag_ea: ||${chatItem.author.name}||: `
           }
-          if(data.snippet.displayMessage.toLowerCase().match(tlTextJP)){
-            text += `:flag_jp: ||${data.authorDetails.displayName}||: `
+          /*if(chatItem.message.starWith(tlTextEsEx)){
+            text += `:flag_ea: ||${chatItem.author.name}||: `
+          }*/
+          if(message.toLowerCase().match(tlTextEN)){
+            text += `:flag_gb: ||${chatItem.author.name}||: `
           }
+          if(message.toLowerCase().match(tlTextJP)){
+            text += `:flag_jp: ||${chatItem.author.name}||: `
+          }
+
           channelids.forEach(element => {
-            if(data.snippet.authorChannelId===element.channelid)
-            text += element.logo_dc+` ${data.authorDetails.displayName}: `
+            if(chatItem.author.channelId===element.channelid)
+            text += element.logo_dc+` ${chatItem.author.name}: `
           });
           if(text.length!==0){
-            text+="``"+data.snippet.displayMessage+"``"
+            text+="``"+message+"``"
             message.channel.send(text)
             text = ""
           }
         })
-           
-        yt.on('error', error => {
-          console.error(error)
-          message.channel.send("No está en vivo o el directo a finalizado")
+
+        liveChat.on("end", (reason) => {
+          message.channel.send("El directo ha finalizado")
+          liveChat.stop()
         })
+
+        liveChat.on("error", (err) => {
+          console.log("ocurrió un error")
+        })
+        const ok = await liveChat.start()
+        if (!ok) {
+          console.log("Failed to start, check emitted error")
+        }
 
     } catch (err) {
         console.log(err);
