@@ -24,6 +24,8 @@ module.exports = {
         on a.id_canal_alerta = v.id_canal_alerta
         Where a.canal_alerta_key = '${channel}'`;
         let key = await pool.query(callvtuberkey);
+        if(key.length!==1) return message.channel.send("Opcion no disponible en este canal");
+        console.log(key);
         let selId_vtuber = `SELECT * FROM Pjt3W34Qzv.video WHERE id_vtuber='${key[0].id_vtuber}' and estado=1`
         let urlvideos = await pool.query(selId_vtuber);
         if(urlvideos.length===0) return message.channel.send("No esta en vivo ahora...");

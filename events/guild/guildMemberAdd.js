@@ -11,17 +11,17 @@ try {
   const context = canvas.getContext('2d')
   // Load the background image and draw it to the canvas
   const background = await Canvas.loadImage(
-    path.join(__dirname, '../../img/wlcm.png')
+    path.join(__dirname, '../../img/Bienvenida_Dark.png')
   )
   context.drawImage(background, 0, 0, canvas.width, canvas.height);
   context.strokeStyle = '#B5FE9A';
   context.strokeRect(0, 0, canvas.width, canvas.height);
   const avatar = await Canvas.loadImage(member.user.displayAvatarURL({ format: 'png' }));
   context.beginPath();
-	context.arc(145, 115, 100, 0, Math.PI * 2, true);
+	context.arc(175, 255, 130, 0, Math.PI * 2, true);
 	context.closePath();
 	context.clip();
-  context.drawImage(avatar, 45, 15, 200,200);
+  context.drawImage(avatar, 45, 125, 260,260);
   var role= member.guild.roles.cache.find(role => role.name === "Neko");
   member.roles.add(role);
   const attachment = new Discord.MessageAttachment(canvas.toBuffer())
