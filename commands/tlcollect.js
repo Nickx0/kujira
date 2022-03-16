@@ -29,21 +29,27 @@ module.exports = {
           message.channel.send('Listo para recoger las traducciones!')
         })
         liveChat.on("chat", (chatItem) => {
-          let message = ""
+          let messages = ""
           let text = ""
           chatItem.message.forEach(element => {
-            message += (element.isCustomEmoji) ? (element.emojiText):((element.text) ? (element.text) : (element.emojiText))
+            messages += (element.isCustomEmoji) ? (element.emojiText):((element.text) ? (element.text) : (element.emojiText))
           });
-          if(message.toLowerCase().match(tlTextES)){
+          if(messages.toLowerCase().match(tlTextES)){
             text += `:flag_ea: ||${chatItem.author.name}||: `
           }
-          if(message.starWith("Es:")||message.starWith("ES:")||message.starWith("Esp:")||message.starWith("ESP:")){
+          if(messages.startsWith("Es:")||messages.startsWith("ES:")||messages.startsWith("Esp:")||messages.startsWith("ESP:")){
             text += `:flag_ea: ||${chatItem.author.name}||: `
           }
-          if(message.toLowerCase().match(tlTextEN)){
+          if(messages.startsWith("En:")||messages.startsWith("EN:")){
             text += `:flag_gb: ||${chatItem.author.name}||: `
           }
-          if(message.toLowerCase().match(tlTextJP)){
+          if(messages.startsWith("JP:")||messages.startsWith("Jp:")){
+            text += `:flag_jp: ||${chatItem.author.name}||: `
+          }
+          if(messages.toLowerCase().match(tlTextEN)){
+            text += `:flag_gb: ||${chatItem.author.name}||: `
+          }
+          if(messages.toLowerCase().match(tlTextJP)){
             text += `:flag_jp: ||${chatItem.author.name}||: `
           }
           channelids.forEach(element => {
@@ -51,7 +57,7 @@ module.exports = {
             text += element.logo_dc+` ${chatItem.author.name}: `
           });
           if(text.length!==0){
-            text+="``"+message+"``"
+            text+="``"+messages+"``"
             message.channel.send(text)
             text = ""
           }
@@ -63,7 +69,7 @@ module.exports = {
         })
 
         liveChat.on("error", (err) => {
-          console.log("ocurrió un error")
+          console.log("ocurrió un error",err)
         })
         const ok = await liveChat.start()
         if (!ok) {

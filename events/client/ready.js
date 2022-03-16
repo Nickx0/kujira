@@ -71,7 +71,7 @@ module.exports = async(message,client) => {
                             )
                             .setTimestamp()
                             .setURL("https://www.youtube.com/watch?v="+lastIdUrl)
-                        message.channels.cache.get(vtuberdata[0].canal_alerta_key).send(embed);
+                        message.channels.cache.get(vtuberdata[0].canal_alerta_key).send(embed).then((message) => message.pin());
                     };
                 }
             }
@@ -122,7 +122,7 @@ module.exports = async(message,client) => {
                             )
                             .setTimestamp()
                             .setURL("https://www.youtube.com/watch?v="+bd[i].id_video)
-                        message.channels.cache.get(bdx[0].canal_alerta_key).send(embed2);
+                        message.channels.cache.get(bdx[0].canal_alerta_key).send(embed2).then((message) => message.pin());
                     }
                 }
             } catch (error) {
