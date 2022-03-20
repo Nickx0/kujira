@@ -71,7 +71,7 @@ module.exports = async(message,client) => {
                             )
                             .setTimestamp()
                             .setURL("https://www.youtube.com/watch?v="+lastIdUrl)
-                        message.channels.cache.get(vtuberdata[0].canal_alerta_key).send(embed).then((message) => message.pin());
+                        message.channels.cache.get(vtuberdata[0].canal_alerta_key).send(embed);
                     };
                 }
             }
@@ -89,7 +89,7 @@ module.exports = async(message,client) => {
                     let up_estado=`UPDATE Pjt3W34Qzv.video SET estado = ${estado} WHERE id_videos = ${bd[i].id_videos};`; 
                     await pool.query(up_estado);
                     if(estado===1 && bd[i].estado!==estado){
-                        let apixurl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(title,channelTitle,liveBroadcastContent),liveStreamingDetails(actualStartTime,concurrentViewers))&id="+bd[i].id_video+"&key="+apikey2;
+                        let apixurl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(title,channelTitle,liveBroadcastContent),liveStreamingDetails(actualStartTime,concurrentViewers))&id="+bd[i].id_video+"&key="+apikey;
                         let luapi = await fetch(apixurl);
                         let respon = await luapi.json();
                         let vtx=`select v.id_vtuber,v.nombre,v.channelid,v.activo,a.canal_alerta_key,
@@ -122,7 +122,7 @@ module.exports = async(message,client) => {
                             )
                             .setTimestamp()
                             .setURL("https://www.youtube.com/watch?v="+bd[i].id_video)
-                        message.channels.cache.get(bdx[0].canal_alerta_key).send(embed2).then((message) => message.pin());
+                        message.channels.cache.get(bdx[0].canal_alerta_key).send(embed2);
                     }
                 }
             } catch (error) {
@@ -133,7 +133,7 @@ module.exports = async(message,client) => {
                 
         }
         
-    }, 90000); 
+    }, 140000); 
     } catch(err) {
         console.log(err);
     message.channel.send({embed: {
