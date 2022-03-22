@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const db = require("megadb");
 const fs = require('fs');
 const ytch = require('yt-channel-info')
+const {YTLive} = require("../YTLive/YTLive")
 const luna = "UCN3mosAMYBdogyQovOhPrxA";
 //const ytdb = new db.crearDB("X")
 function matchYoutubeUrl(url) {
@@ -19,6 +20,11 @@ module.exports = {
     run: async (client, message, args) => {
     (async () => {
     try {
+        let ytlive = new YTLive({channelId:"UCP0BspO_AMEe3aQqqpo89Dg"})
+        await ytlive.getLiveData()
+        console.log(ytlive.data)
+        console.log(ytlive.isLiveNow())
+        console.log(ytlive.getVideoInfo())
         ytch.getChannelVideos(luna).then((response) => {
             if (!response.alertMessage) {
                console.log(response[0])

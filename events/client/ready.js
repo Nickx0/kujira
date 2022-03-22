@@ -5,6 +5,7 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const got = require("got");
 const pool = require('../../db-connection.js');
+const {YTLive} = require("../../YTLive/YTLive")
 var lastIdUrl;
 async function getLastId(urlx){
     let urs = "https://www.youtube.com/feeds/videos.xml?channel_id="+urlx;
@@ -81,17 +82,20 @@ module.exports = async(message,client) => {
             for(i=0;i<bd.length;i++){
             try {
                 console.log(bd[i].id_video);
-                let apixurl2 = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(liveBroadcastContent))&id="+bd[i].id_video+"&key="+apikey2;
+                let ytlive = new YTLive({liveId : bd[i].id_video})
+                await ytlive.getLiveData()
+                let estado = (ytlive.isLiveNow()) ? 1 : ytlive.isFinished() ? 0 : 2;
+                /*let apixurl2 = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(liveBroadcastContent))&id="+bd[i].id_video+"&key="+apikey2;
                 let luapi2 = await fetch(apixurl2);
                 let respon2 = await luapi2.json();
-                let estado =(respon2.items.length==0)?0:(respon2.items[0].snippet.liveBroadcastContent==="live")? 1:(respon2.items[0].snippet.liveBroadcastContent==="none")?0:2;
+                let estado =(respon2.items.length==0)?0:(respon2.items[0].snippet.liveBroadcastContent==="live")? 1:(respon2.items[0].snippet.liveBroadcastContent==="none")?0:2;*/
                 if(bd[i].estado!==estado){
                     let up_estado=`UPDATE Pjt3W34Qzv.video SET estado = ${estado} WHERE id_videos = ${bd[i].id_videos};`; 
                     await pool.query(up_estado);
                     if(estado===1 && bd[i].estado!==estado){
-                        let apixurl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(title,channelTitle,liveBroadcastContent),liveStreamingDetails(actualStartTime,concurrentViewers))&id="+bd[i].id_video+"&key="+apikey;
+                        /*let apixurl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(title,channelTitle,liveBroadcastContent),liveStreamingDetails(actualStartTime,concurrentViewers))&id="+bd[i].id_video+"&key="+apikey;
                         let luapi = await fetch(apixurl);
-                        let respon = await luapi.json();
+                        let respon = await luapi.json();*/
                         let vtx=`select v.id_vtuber,v.nombre,v.channelid,v.activo,a.canal_alerta_key,
                         c.value_color,e.logo
                         from vtuberlist v 
@@ -104,8 +108,8 @@ module.exports = async(message,client) => {
                         Where v.id_vtuber = '${bd[i].id_vtuber}'`
                         let bdx = await pool.query(vtx);
                         let img2 = "https://img.youtube.com/vi/"+bd[i].id_video+"/maxresdefault.jpg";
-                        let view2 = respon.items[0].liveStreamingDetails.concurrentViewers;
-                        startime2 = respon.items[0].liveStreamingDetails.actualStartTime;
+                        let view2 = ytlive.getViewCount();//respon.items[0].liveStreamingDetails.concurrentViewers;
+                        startime2 = ytlive.getStartTime()//respon.items[0].liveStreamingDetails.actualStartTime;
                         date2 = new Date(startime2);
                         starmili2 = date2.getTime();
                         let timestr2 = `Empezo <t:${starmili2/1000}:R>`;
@@ -133,7 +137,7 @@ module.exports = async(message,client) => {
                 
         }
         
-    }, 140000); 
+    }, 60000); 
     } catch(err) {
         console.log(err);
     message.channel.send({embed: {
