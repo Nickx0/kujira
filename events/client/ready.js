@@ -82,17 +82,18 @@ module.exports = async(message,client) => {
             for(i=0;i<bd.length;i++){
             try {
                 console.log(bd[i].id_video);
-                let ytlive = new YTLive({liveId : bd[i].id_video})
-                await ytlive.getLiveData()
-                let estado = (ytlive.isLiveNow()) ? 1 : ytlive.isFinished() ? 0 : 2;
-                /*let apixurl2 = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(liveBroadcastContent))&id="+bd[i].id_video+"&key="+apikey2;
+                
+                //let estado = (ytlive.isLiveNow()) ? 1 : ytlive.isFinished() ? 0 : 2;
+                let apixurl2 = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(liveBroadcastContent))&id="+bd[i].id_video+"&key="+apikey2;
                 let luapi2 = await fetch(apixurl2);
                 let respon2 = await luapi2.json();
-                let estado =(respon2.items.length==0)?0:(respon2.items[0].snippet.liveBroadcastContent==="live")? 1:(respon2.items[0].snippet.liveBroadcastContent==="none")?0:2;*/
+                let estado =(respon2.items.length==0)?0:(respon2.items[0].snippet.liveBroadcastContent==="live")? 1:(respon2.items[0].snippet.liveBroadcastContent==="none")?0:2;
                 if(bd[i].estado!==estado){
                     let up_estado=`UPDATE Pjt3W34Qzv.video SET estado = ${estado} WHERE id_videos = ${bd[i].id_videos};`; 
                     await pool.query(up_estado);
                     if(estado===1 && bd[i].estado!==estado){
+                        let ytlive = new YTLive({liveId : bd[i].id_video})
+                        await ytlive.getLiveData()
                         /*let apixurl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(title,channelTitle,liveBroadcastContent),liveStreamingDetails(actualStartTime,concurrentViewers))&id="+bd[i].id_video+"&key="+apikey;
                         let luapi = await fetch(apixurl);
                         let respon = await luapi.json();*/
