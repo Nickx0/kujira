@@ -4,7 +4,7 @@ export declare class YTLive {
   id: { channelId: string; } | { liveId: string; };
   data: any;
   constructor(id: { channelId: string; } | { liveId: string; });
-  getLiveData(): ThisType;
+  getLiveData(): void;
   getLiveinformation(data: any): any;
   isVideo(): boolean;
   isPremiere(): boolean;
@@ -15,9 +15,14 @@ export declare class YTLive {
   isLowLatencyLiveStream(): boolean;
   isPrivate(): boolean;
   isUnlisted(): boolean;
+  getChannelId(): any;
   getProfileInfo(): any;
   isRegressless(): any;
   getVideoInfo(): any;
   getStartTime(): any;
+  getScheduledStartTime(): number;
   getliveBroadcastDetails(): any;
+  getViewCount(): any;
+  getDuration(): any;
+  getTitle(): any;
 }

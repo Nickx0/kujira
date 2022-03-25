@@ -24,7 +24,6 @@ class YTLive {
       });
     this.data = res;
     this.liveId = res.videoDetails.videoId
-    return this;
   }
   getLiveinformation(data) {
     let LiveInfo;
@@ -67,6 +66,9 @@ class YTLive {
       return this.data.microformat.playerMicroformatRenderer.isUnlisted;
     }
   }
+  getChannelId(){
+    return this.data.videoDetails.channelId;
+  }
   getProfileInfo() {
     let channel = this.data.videoDetails.channelId;
     let author = this.data.videoDetails.author;
@@ -74,7 +76,7 @@ class YTLive {
     if("channelId" in this.id){
       isFamilySafe = this.data.microformat.microformatDataRenderer.familySafe;
     }else{
-      isFamilySafe = this.data.microformat.playerMicroformatRenderer.familySafe;
+      isFamilySafe = this.data.microformat.playerMicroformatRenderer.isFamilySafe;
     }
     return { channel, author, isFamilySafe };
   }
@@ -122,6 +124,9 @@ class YTLive {
       return this.data.microformat.playerMicroformatRenderer.liveBroadcastDetails.startTimestamp;
     }
   }
+  getScheduledStartTime(){
+    return this.data.playabilityStatus.liveStreamability.liveStreamabilityRenderer.offlineSlate.liveStreamOfflineSlateRenderer.scheduledStartTime;
+  }
   getliveBroadcastDetails() {
     if("channelId" in this.id){
       return this.data.microformat.microformatDataRenderer.liveBroadcastDetails;
@@ -131,6 +136,12 @@ class YTLive {
   }
   getViewCount(){
     return this.data.videoDetails.viewCount;
+  }
+  getDuration(){
+    return this.data.videoDetails.lengthSeconds;
+  }
+  getTitle(){
+    return this.data.videoDetails.title;
   }
 }
 exports.YTLive = YTLive;

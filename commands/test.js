@@ -21,7 +21,6 @@ module.exports = {
     (async () => {
     try {
         let ytlive = new YTLive({channelId:"UCP0BspO_AMEe3aQqqpo89Dg"})
-        await ytlive.getLiveData()
         console.log(ytlive.data)
         console.log(ytlive.isLiveNow())
         console.log(ytlive.getVideoInfo())
