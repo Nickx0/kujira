@@ -1,6 +1,7 @@
 const Discord = require("discord.js");
 const fetch = require("node-fetch");
 const config = require("../config");
+var {vtuberlist,yTlives} = require('../lives.js');
 const apikey = config.apikey;
 
 function verifyURL(url) {
@@ -34,7 +35,7 @@ function convertMS(ms) {
     d = Math.floor(h / 24);
     h = h % 24;
     h += d * 24;
-    return h + ':' + m + ':' + s;
+    return ((h!==0)?(h<10)?'0'+h+':':h+':':'')+((m<10)?'0'+m:m)+':'+((s<10)?'0'+s:s);
 }
 module.exports = {
  name: "stream",
@@ -43,14 +44,29 @@ module.exports = {
  run: async (client, message, args) => {
   (async () => {
     try {
-        IdUrl = await verifyURL(args[0])
-        console.log(IdUrl+"xd");
-        if(IdUrl===false){
+        idVideo = ""
+        if(args.length !== 0) {idVideo = verifyURL(args[0])}
+        if(args.length === 0) {
+            let channel = message.channel.id;
+            let callvtuberkey = `select a.canal_alerta_key,v.id_vtuber
+            from canal_alerta a 
+            inner join vtuberlist v
+            on a.id_canal_alerta = v.id_canal_alerta
+            Where a.canal_alerta_key = '${channel}'`;
+            let key = await pool.query(callvtuberkey);
+            if(key.length!==1) return message.channel.send("Opcion no disponible en este canal");
+            console.log(key);
+            let selId_vtuber = `SELECT * FROM Pjt3W34Qzv.video WHERE id_vtuber='${key[0].id_vtuber}' and estado=1`
+            let urlvideos = await pool.query(selId_vtuber);
+            idVideo = urlvideos[0].id_video
+        }
+        console.log(`Stream: ${idVideo}`);
+        if(idVideo===""||idVideo===false){
             return message.channel.send({embed: {
                 color: 16734039,
                 description: "URL INVALIDA"
             }})
-        };
+        }
         let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet,liveStreamingDetails,contentDetails&fields=items(snippet(title,channelTitle,liveBroadcastContent),liveStreamingDetails(scheduledStartTime,concurrentViewers),statistics(viewCount),contentDetails(duration))&id="+IdUrl+"&key="+apikey;
         //Json FIle Api to object
         const apirl = await fetch(apiurl);
