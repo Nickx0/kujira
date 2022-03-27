@@ -12,6 +12,7 @@ class YTLive {
     this.id = id;
   }
   async getLiveData() {
+    this.liveId = "";
     const url = "channelId" in this.id
       ? `https://www.youtube.com/channel/${this.id.channelId}/live`
       : `https://www.youtube.com/watch?v=${this.id.liveId}`;
@@ -20,7 +21,7 @@ class YTLive {
         return this.getLiveinformation(response.data.toString());
       })
       .catch(error => {
-        console.log(error)
+        throw error;
       });
     this.data = res;
     this.liveId = res.videoDetails.videoId

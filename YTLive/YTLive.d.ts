@@ -1,5 +1,4 @@
 export declare class YTLive {
-  
   liveId?: String;
   id: { channelId: string; } | { liveId: string; };
   data: any;
