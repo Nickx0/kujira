@@ -243,18 +243,19 @@ async function sleep(ms) {
   {
     let estado = (live.isLiveNow() ? 1:live.isWaiting() ? 2:0);//getting status live class
     let exists = await existLive(live.liveId);//load validador
+    let vTuber = vtuberlist.find(vtuber => vtuber.channelid === live.getChannelId());
     if(exists){//validador if exist or no
       let db = await getLiveState(live.liveId);//getting status of live
       if(db.length!==0){//live finished, officialy finished in db
         if(db[0].estado!==estado){
           await updateLiveState(live.liveId,estado)
-          if(estado===1||estado===2){//state 2 is imposible, but i don´t want to lose anything
+          if(estado===1){//state 2 is imposible, but i don´t want to lose anything
             sendDMessage(live,estado,vTuber)//message sender
           }
         }
       }
     }else{
-      let vTuber = vtuberlist.find(vtuber => vtuber.channelid === live.getChannelId());
+      //let vTuber = vtuberlist.find(vtuber => vtuber.channelid === live.getChannelId());
       await setLive(vTuber,live.liveId,estado);
       if(estado!==0||live.isVideo()){
         sendDMessage(live,estado,vTuber);
