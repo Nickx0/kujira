@@ -344,7 +344,7 @@ async function sleep(ms) {
   }
   
   async function updateLiveState(liveId,estado){
-    return await pool.query(`UPDATE Pjt3W34Qzv.video SET estado = ${estado} WHERE id_video = ${liveId};`);
+    return await pool.query(`UPDATE Pjt3W34Qzv.video SET estado = ${estado} WHERE id_video = '${liveId}';`);
   }
   
   async function existLive(live){
