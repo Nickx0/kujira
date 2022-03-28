@@ -308,7 +308,7 @@ async function sleep(ms) {
       timestr = `Inicia <t:${live.getScheduledStartTime()}:R>`
     }else if(live.isVideo()){
       Status = `Video`
-      timestr = `${convertMS(live.getDuration())}`;
+      timestr = `${convertMS(live.getDuration()*1000)}`;
       view = live.getViewCount();
     }
     let embed = new Discord.MessageEmbed()
