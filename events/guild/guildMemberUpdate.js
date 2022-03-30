@@ -2,7 +2,6 @@ const Discord = require('discord.js');
 const config = require("../../config");
 
 module.exports = async (client, oldMember, newMember) => {
-/*
 try {
  var logChannel = oldMember.guild.channels.cache.find(c => c.name === "log");
  if (!logChannel) return;
@@ -71,5 +70,4 @@ try {
   .setTimestamp();
  console.log(err);
 }
-*/
 }

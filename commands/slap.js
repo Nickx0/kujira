@@ -5,7 +5,7 @@ module.exports = {
  name: "slap",
  description: "slap a user",
  category: "Fun",
- usage: "cuddle <user>",
+ usage: "slap <user>",
  run: async (client, message, args) => {
   (async () => {
    try {

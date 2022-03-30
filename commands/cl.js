@@ -1,8 +1,9 @@
 module.exports = {
 	name: 'cl',
-	description: 'limpiara mensajes(uso de admin)',
+	description: 'Clean messages between 1 to 99',
     guildOnly: true,
     category: "Moderation",
+    usage: "cl <number of messages>",
 	run: async (client, message, args) => { {
             const amount = parseInt(args[0]) + 1;
             if(message.author.id === "373887814963560448"){

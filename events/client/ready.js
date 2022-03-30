@@ -1,16 +1,12 @@
 const Discord = require("discord.js");
 var {vtuberlist,yTlives} = require('../../lives.js');
-//const { apikey2, apikey } = require("../../config.json");
-//const fetch = require("node-fetch");
+const { apikey2, apikey } = require("../../config.json");
+const fetch = require("node-fetch");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const got = require("got");
 const pool = require('../../db-connection.js');
-const {YTLive} = require("../../YTLive/YTLive");
-
-
-
-
+const {YTLive} = require("../../YTlive/YTlive");
 /*var lastIdUrl;
 async function getLastId(urlx){
     let urs = "https://www.youtube.com/feeds/videos.xml?channel_id="+urlx;
@@ -24,10 +20,7 @@ async function getLastId(urlx){
         console.log(err);
       });
 }
-
 let totalVT='SELECT * FROM Pjt3W34Qzv.vtuberlist';*/
-
-
 let clientMessage;
 module.exports = async(message,client) => {
     try {
@@ -91,7 +84,6 @@ module.exports = async(message,client) => {
                     };
                 }
             }
-
             let vt='SELECT * FROM Pjt3W34Qzv.video Where estado=1 Or estado=2 ORDER BY id_videos DESC'; // CAMBIAR A 1 Y 2
             let bd = await pool.query(vt);
             for(i=0;i<bd.length;i++){
@@ -196,8 +188,12 @@ async function checklastVideoRSS(){
       live = new YTLive({liveId: lastIdUrl});
       try {
         await live.getLiveData();
-        updateStates(live)
-        console.log(`RSS: ${live.liveId}`)
+        if (live.liveId!==''){
+          updateStates(live)
+          console.log(`RSS: ${live.liveId}`)
+        }else{
+          console.log('RSS :'+live.id+" "+vtuber.channelid);
+        }
       } catch (error) {
         console.error(`RSS: ${error}`);
         console.log(`RSS: ${vtuber.channelid}`)
@@ -212,7 +208,7 @@ async function checklastVideoRSS(){
 
 async function checkLives(){
   loadVTObjects(vtuberlist)
-  console.log(yTlives)
+  //console.log(yTlives)
   try{
     setInterval(async function(){
       for (let ytlive of yTlives) {
@@ -227,7 +223,7 @@ async function checkLives(){
         await sleep(300);
         //console.log(ytlive.getVideoInfo());
       }
-    }, 90000); 
+    }, 120000); 
   } catch(err) {
     console.log(err);
   }
@@ -248,10 +244,10 @@ async function sleep(ms) {
       let db = await getLiveState(live.liveId);//getting status of live
       if(db.length!==0){//live finished, officialy finished in db
         if(db[0].estado!==estado){
-          await updateLiveState(live.liveId,estado)
           if(estado===1){//state 2 is imposible, but i don´t want to lose anything
             sendDMessage(live,estado,vTuber)//message sender
           }
+          await updateLiveState(live.liveId,estado)
         }
       }
     }else{
@@ -299,7 +295,13 @@ async function sleep(ms) {
     if(estado===1){
       Status = `En Vivo`;
       view = live.getViewCount();
-      let startime = live.getStartTime();
+
+      let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet,liveStreamingDetails&fields=items(snippet(title),liveStreamingDetails(actualStartTime),statistics(viewCount))&id="+live.liveId+"&key="+apikey;
+      let apirl = await fetch(apiurl);
+      let r = await apirl.json();
+
+      let startime = r.items[0].liveStreamingDetails.actualStartTime;
+
       let date = new Date(startime);
       starmili = date.getTime();
       timestr = `Empezo <t:${starmili/1000}:R>`;
@@ -312,36 +314,35 @@ async function sleep(ms) {
       view = live.getViewCount();
     }
     let embed = new Discord.MessageEmbed()
-    .setTitle(`${live.getTitle()}`)
-    .setImage(img)
-    .setDescription(live.getProfileInfo().author)
-    .setThumbnail(vTuber.logo)
-    .setColor(vTuber.value_color)
-    .addFields(
-    { name: 'Status', value: `${Status}`, inline: true },
-    { name: 'Time', value: `${timestr}`, inline: true },
-    { name: 'Viewers', value: `${view}`, inline: true },
-    )
-    .setTimestamp()
-    .setURL("https://www.youtube.com/watch?v="+live.liveId)
+        .setTitle(`${live.getTitle()}`)
+        .setImage(img)
+        .setDescription(live.getProfileInfo().author)
+        .setThumbnail(vTuber.logo)
+        .setColor(vTuber.value_color)
+        .addFields(
+        { name: 'Status', value: `${Status}`, inline: true },
+        { name: 'Time', value: `${timestr}`, inline: true },
+        { name: 'Viewers', value: `${view}`, inline: true },
+        )
+        .setTimestamp()
+        .setURL("https://www.youtube.com/watch?v="+live.liveId)
     clientMessage.channels.cache.get(vTuber.canal_alerta_key).send(embed);
-  }
-  
+}
     function convertMS(ms) {
-      var d, h, m, s;
-      s = Math.floor(ms / 1000);
-      m = Math.floor(s / 60);
-      s = s % 60;
-      h = Math.floor(m / 60);
-      m = m % 60;
-      d = Math.floor(h / 24);
-      h = h % 24;
-      h += d * 24;
-      return ((h!==0)?(h<10)?'0'+h+':':h+':':'')+((m<10)?'0'+m:m)+':'+((s<10)?'0'+s:s);
-  }
-  
+        var d, h, m, s;
+        s = Math.floor(ms / 1000);
+        m = Math.floor(s / 60);
+        s = s % 60;
+        h = Math.floor(m / 60);
+        m = m % 60;
+        d = Math.floor(h / 24);
+        h = h % 24;
+        h += d * 24;
+        return ((h!==0)?(h<10)?'0'+h+':':h+':':'')+((m<10)?'0'+m:m)+':'+((s<10)?'0'+s:s);
+}
+
   async function setLive(vTuber,liveId,estado){
-    return await pool.query(`INSERT INTO Pjt3W34Qzv.video(id_videos,id_vtuber,id_video,estado) VALUES(NULL,'${vTuber.id_vtuber}','${liveId}','${estado}')`);
+    return await pool.query(`INSERT INTO Pjt3W34Qzv.video(id_videos,id_vtuber,id_video,estado) VALUES(NULL,'${vTuber.id_vtuber}','${liveId}',${estado})`);
   }
   
   async function updateLiveState(liveId,estado){
@@ -351,30 +352,29 @@ async function sleep(ms) {
   async function existLive(live){
     list = await pool.query(`SELECT * FROM Pjt3W34Qzv.video WHERE id_video='${live}'`);
     return (list.length===1)
-  }
-  
-  function loadVTObjects(vtuberlist){
+}
+
+function loadVTObjects(vtuberlist){
     vtuberlist.forEach(element => {
-      yTlives.push(new YTLive({channelId: element.channelid}))
-      console.log(`LOADED: ${element.name} ${element.channelid}`)
+        yTlives.push(new YTLive({channelId: element.channelid}))
+        console.log(`LOADED: ${element.nombre} ${element.channelid}`)
     });
-  }
-  function updateVTlist(list){
+}
+function updateVTlist(list){
     list.forEach(element => {
-      vtuberlist.push(new YTLive({channelId: element.channelid}))
-      console.log(`ADDED: ${element.name} ${element.channelid}`)
+        vtuberlist.push(new YTLive({channelId: element.channelid}))
+        console.log(`ADDED: ${element.nombre} ${element.channelid}`)
     });
-  }
-  
-  async function listVtubers(){
+}
+
+async function listVtubers(){
     return await pool.query(`select v.id_vtuber,v.nombre,v.channelid,v.activo,a.canal_alerta_key,
-                          c.value_color,e.logo
-                          from vtuberlist v 
-                          inner join canal_alerta a
-                          on v.id_canal_alerta = a.id_canal_alerta
-                          inner join empresa e
-                          on v.id_empresa = e.id_empresa
-                          inner join colores c
-                          on v.id_color=c.id_color`);
-  }
-  
+        c.value_color,e.logo
+        from vtuberlist v 
+        inner join canal_alerta a
+        on v.id_canal_alerta = a.id_canal_alerta
+        inner join empresa e
+        on v.id_empresa = e.id_empresa
+        inner join colores c
+        on v.id_color=c.id_color`);
+}

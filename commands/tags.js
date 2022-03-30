@@ -30,8 +30,9 @@ function verifyURL(url) {
 
 module.exports = {
     name: "tags",
-    description: "Obtiene los tags de streams",
+    description: "get the tags from stream",
     category: "Utility",
+    usage: "tags [ytlink]",
     run: async (client, message, args) => {
     (async () => {
     try {
@@ -64,7 +65,7 @@ module.exports = {
         console.log(dataVideo.segundo.length);
         console.log(descriptiontag.lenght);
         for(i=0;i<dataVideo.segundo.length;i++){
-            descriptiontag +=`[${convertMS(dataVideo.segundo[i]*1000)}](https://www.youtube.com/watch?v=${idVideo}&t=${dataVideo.segundo[i]}) : ${dataVideo.tag[i]} \n`;
+            descriptiontag +=`${i+1} - [${convertMS(dataVideo.segundo[i]*1000)}](https://www.youtube.com/watch?v=${idVideo}&t=${dataVideo.segundo[i]}) : ${dataVideo.tag[i]} \n`;
             if(descriptiontag.length>3000){
                 const embed = new Discord.MessageEmbed()
                 .setTitle(`Tags de ${r.items[0].snippet.channelTitle}`)

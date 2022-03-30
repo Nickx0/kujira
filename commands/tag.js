@@ -9,8 +9,9 @@ const {MongoClient} = require('mongodb');
 var mongoclient = new MongoClient(datadb.uri);
 module.exports = {
     name: "t",
-    description: "tags para streams",
+    description: "tags for streams",
     category: "Utility",
+    usage: "t [offset] <tag>",
     run: async (client, message, args) => {
     (async () => {
     try {  

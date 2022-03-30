@@ -1,8 +1,8 @@
 const Discord = require("discord.js");
 const fetch = require("node-fetch");
 const config = require("../config");
-var {vtuberlist,yTlives} = require('../lives.js');
 const apikey = config.apikey;
+var {vtuberlist,yTlives} = require('../lives.js');
 
 function verifyURL(url) {
     var p = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
@@ -39,8 +39,9 @@ function convertMS(ms) {
 }
 module.exports = {
  name: "stream",
- description: "Sends a infro from stream",
+ description: "get information about a stream",
  category: "Fun",
+ usage: "stream [ytlink]",
  run: async (client, message, args) => {
   (async () => {
     try {
@@ -66,7 +67,7 @@ module.exports = {
                 color: 16734039,
                 description: "URL INVALIDA"
             }})
-        }
+        };
         let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet,liveStreamingDetails,contentDetails&fields=items(snippet(title,channelTitle,liveBroadcastContent),liveStreamingDetails(scheduledStartTime,concurrentViewers),statistics(viewCount),contentDetails(duration))&id="+IdUrl+"&key="+apikey;
         //Json FIle Api to object
         const apirl = await fetch(apiurl);

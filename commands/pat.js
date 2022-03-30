@@ -3,7 +3,7 @@ const fetch = require("node-fetch");
 
 module.exports = {
   name: "pat",
-  description: "un pat al usuario",
+  description: "give a pat to the mentioned user",
   category: "Fun",
   usage: "pat <user>",
   run: async (client, message, args) => {

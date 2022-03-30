@@ -2,10 +2,10 @@ const Discord = module.require("discord.js");
 const malScraper = require('mal-scraper');
 
 module.exports = {
- name: "anime",
- description: "Search for anime list",
- category: "Fun",
- usage: "animesearch <name>",
+  name: "anime",
+  description: "Search a Anime",
+  category: "Fun",
+  usage: "animesearch <anime name>",
  run: async (client, message, args) => {
   try {
    const search = `${args}`;

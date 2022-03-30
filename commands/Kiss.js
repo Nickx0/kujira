@@ -3,9 +3,9 @@ const fetch = require("node-fetch");
 
 module.exports = {
   name: "kiss",
-  description: "besa usuario",
+  description: "kiss the mentioned user",
   category: "Fun",
-  usage: "cuddle <user>",
+  usage: "kiss <user>",
   run: async (client, message, args) => {
   (async () => {
     var list = [

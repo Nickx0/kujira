@@ -4,9 +4,9 @@ const pool = require('../db-connection.js');
 
 module.exports = {
     name: "vtuber",
-    description: "Tarjeta vtubers",
+    description: "Vtuber cards",
     category: "Vtuber",
-    usage: "nya",
+    usage: "vtuber [name]",
     run: async (client, message, args) => {
         (async () => {
         try {

@@ -13,8 +13,9 @@ function convertMS(ms) {
 
 module.exports = {
     name: "time",
-    description: "momento actual de stream",
+    description: "get time from stream",
     category: "Utility",
+    usage: "time",
     run: async (client, message, args) => {
     (async () => {
     try {

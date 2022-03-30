@@ -2,7 +2,6 @@ const Discord = require('discord.js');
 const config = require("../../config");
 
 module.exports = async (client, oldRole, newRole) => {
-/*
 try {
  if (!oldRole.guild.member(client.user).hasPermission("EMBED_LINKS")) return;
  if (!oldRole.guild.member(client.user).hasPermission("VIEW_AUDIT_LOG"))return;
@@ -60,5 +59,5 @@ try {
   .setTimestamp();
  return logChannel.send(embed);
 }
-*/
+
 }

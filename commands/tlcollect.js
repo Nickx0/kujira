@@ -7,9 +7,10 @@ const tlTextEN= /^\[en\]|\(en\)$/
 const tlTextJP = /^\[jp\]|\(jp\)$/
 
 module.exports = {
-    name: "tlcollector",
-    description: "tlcollector para streams",
+    name: "tl",
+    description: "get the translations from youtube chat",
     category: "Utility",
+    usage: "tl",
     run: async (client, message, args) => {
     (async () => {
     try {

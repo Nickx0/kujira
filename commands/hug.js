@@ -5,7 +5,7 @@ module.exports = {
  name: "hug",
  description: "Give a hug to mention user",
  category: "Fun",
- usage: "cuddle <user>",
+ usage: "hug <user>",
  run: async (client, message, args) => {
   (async () => {
    try {
@@ -41,6 +41,7 @@ module.exports = {
     .setURL(body.url);
     message.channel.send(embed);
    } catch(err) {
+    console.log(err);
     message.channel.send({embed: {
      color: 16734039,
      description: "Something went wrong... :cry:"

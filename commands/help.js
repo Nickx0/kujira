@@ -77,20 +77,17 @@ module.exports = {
      }})
      }
     } else {
-     function capitalizeFirstLetter(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
-     }
-     alliaseslist = cmd.aliases.toString() || "None";
      const hembed = new Discord.MessageEmbed()
       .setTitle(`:grey_question: Help - ${cmd.name} command`, message.guild.iconURL())
       .setColor('RANDOM')
       .setTimestamp()
-      .setDescription("Category: `" + cmd.category + "`\n Description: `" + cmd.description + "`\n Usage: `" + prefix + " " + cmd.usage + "`\n Aliases: `" + alliaseslist + "`")
+      .setDescription("Category: `" + cmd.category + "`\n Description: `" + cmd.description + "`\n Usage: `" + prefix + "" + cmd.usage + "`")
       .setFooter('Syntax: <> = required, [] = optional • Requested by ' + `${message.author.username}`, message.author.displayAvatarURL({ dynamic: true, format: 'png', size: 2048 }))
      message.channel.send(hembed);
     }
    }
   } catch (err) {
+    console.log(err);
    message.channel.send({embed: {
     color: 16734039,
     description: "Something went wrong... :cry:"
