@@ -23,6 +23,9 @@ class YTLive {
       .catch(error => {
         throw error;
       });
+      if(!res){
+        throw new Error("error de axios")
+      }
     this.data = res;
     this.liveId = res.videoDetails.videoId
   }
@@ -49,6 +52,9 @@ class YTLive {
     return this.data.videoDetails.isLiveContent;
   }
   isLiveNow() {
+    if(!this.data){
+      throw new Error("No Live info")
+    }
     return (this.data.videoDetails) ? ((this.data.videoDetails.isLive) ? this.data.videoDetails.isLive: false): false
   }
   isFinished() {

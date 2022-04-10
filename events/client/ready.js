@@ -175,31 +175,28 @@ async function checklastVideoRSS(){
     setInterval(async function(){
       for (let vtuber of vtuberlist) {
         let urs = "https://www.youtube.com/feeds/videos.xml?channel_id="+vtuber.channelid;
-        //Xml File to Json
-        let lastIdUrl= await got(urs).then(response => {
-        let dom = new JSDOM(response.body);
-        //console.log(dom.window.document.querySelector('title').textContent);
-        let vsg = dom.window.document.getElementsByTagName("yt:videoId");
-        lastId = vsg[0].textContent;
-        return lastId;
-      }).catch(err => {
-        console.error(`RSS: ${err}`)
-      });
-      live = new YTLive({liveId: lastIdUrl});
-      try {
-        await live.getLiveData();
-        if (live.liveId!==''){
-          updateStates(live)
-          console.log(`RSS: ${live.liveId}`)
-        }else{
-          console.log('RSS :'+live.id+" "+vtuber.channelid);
+        r = await fetch(urs);
+        const body = await r.text();
+        let LiveInfo="";
+        const info = body.toString().match(/<yt:videoId>(.+?)<\//);
+        if (info) {
+          LiveInfo = info[1];
         }
-      } catch (error) {
-        console.error(`RSS: ${error}`);
-        console.log(`RSS: ${vtuber.channelid}`)
-      }
-      await sleep(500);
-      }
+        live = new YTLive({liveId: LiveInfo});
+        try {
+          await live.getLiveData();
+          if (live.liveId!==''){
+            updateStates(live)
+            console.log(`RSS: ${live.liveId}`)
+          }else{
+            console.log('RSS :'+live.id+" "+vtuber.channelid);
+          }
+        } catch (error) {
+          console.error(`RSS: ${error}`);
+          console.log(`RSS: ${vtuber.channelid}`)
+        }
+        await sleep(500);
+        }
     }, 300000); 
   } catch(err) {
     console.log(err);
@@ -237,6 +234,7 @@ async function sleep(ms) {
   
   async function updateStates(live)
   {
+    try {
     let estado = (live.isLiveNow() ? 1:live.isWaiting() ? 2:0);//getting status live class
     let exists = await existLive(live.liveId);//load validador
     let vTuber = vtuberlist.find(vtuber => vtuber.channelid === live.getChannelId());
@@ -258,9 +256,15 @@ async function sleep(ms) {
       }
       checkFinisheds(vTuber);
     }
+    
+    
+  } catch (error) {
+      console.error(error);
+  }
   }
   
   async function checkFinisheds(vTuber){
+    try {
     let db = await getLastestLives(vTuber.channelid);
     if(db.length >0){
       for (let dblive of db) {
@@ -272,6 +276,9 @@ async function sleep(ms) {
         }
       }
     }
+  } catch (error) {
+      console.log(error);
+  }
   }  
   
   async function getLiveState(liveId){
