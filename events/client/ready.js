@@ -236,7 +236,7 @@ async function sleep(ms) {
   {
     try {
     let estado = (live.isLiveNow() ? 1:live.isWaiting() ? 2:0);//getting status live class
-    let exists = await existLive(live.liveId);//load validador
+    let exists = await existLivedb(live.liveId);//load validador
     let vTuber = vtuberlist.find(vtuber => vtuber.channelid === live.getChannelId());
     if(exists){//validador if exist or no
       let db = await getLiveState(live.liveId);//getting status of live
@@ -244,13 +244,14 @@ async function sleep(ms) {
         if(db[0].estado!==estado){
           if(estado===1){//state 2 is imposible, but i don´t want to lose anything
             sendDMessage(live,estado,vTuber)//message sender
+            checkFinisheds(vTuber)
           }
-          await updateLiveState(live.liveId,estado)
+          await updateLiveStatedb(live.liveId,estado)
         }
       }
     }else{
       //let vTuber = vtuberlist.find(vtuber => vtuber.channelid === live.getChannelId());
-      await setLive(vTuber,live.liveId,estado);
+      await setLivedb(vTuber,live.liveId,estado);
       if(estado!==0||live.isVideo()){
         sendDMessage(live,estado,vTuber);
       }
@@ -269,17 +270,24 @@ async function sleep(ms) {
     if(db.length >0){
       for (let dblive of db) {
         live = new YTLive({liveId: dblive.liveId});
-        await live.getLiveData();
-        let estado = (live.isLiveNow() ? 1:live.isWaiting() ? 2:0);
-        if(dblive.estado!==estado){
-          if(estado===0) updateLiveState(live.liveId,estado)
+        try {
+          await live.getLiveData();
+          let estado = (live.isLiveNow() ? 1:live.isWaiting() ? 2:0);
+          console.log(`CheckF: ${live.liveId} state: ${estado}`)
+          if(dblive.estado!==estado){
+            if(estado===0) {
+              updateLiveStatedb(live.liveId,estado)
+            } 
+          }
+        } catch (error) {
+          updateLiveStatedb(live.liveId,0)
         }
       }
     }
   } catch (error) {
       console.log(error);
   }
-  }  
+  } 
   
   async function getLiveState(liveId){
     return await pool.query(`select v.id_video as liveId,v.estado as estado
@@ -348,15 +356,15 @@ async function sleep(ms) {
         return ((h!==0)?(h<10)?'0'+h+':':h+':':'')+((m<10)?'0'+m:m)+':'+((s<10)?'0'+s:s);
 }
 
-  async function setLive(vTuber,liveId,estado){
+  async function setLivedb(vTuber,liveId,estado){
     return await pool.query(`INSERT INTO Pjt3W34Qzv.video(id_videos,id_vtuber,id_video,estado) VALUES(NULL,'${vTuber.id_vtuber}','${liveId}',${estado})`);
   }
   
-  async function updateLiveState(liveId,estado){
+  async function updateLiveStatedb(liveId,estado){
     return await pool.query(`UPDATE Pjt3W34Qzv.video SET estado = ${estado} WHERE id_video = '${liveId}';`);
   }
   
-  async function existLive(live){
+  async function existLivedb(live){
     list = await pool.query(`SELECT * FROM Pjt3W34Qzv.video WHERE id_video='${live}'`);
     return (list.length===1)
 }

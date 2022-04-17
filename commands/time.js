@@ -32,8 +32,10 @@ module.exports = {
         console.log(urlvideos);
         if(urlvideos.length==0) return message.channel.send("No esta en vivo ahora...");  
         let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(liveBroadcastContent),liveStreamingDetails(actualStartTime))&id="+urlvideos[0].id_video+"&key="+apikey;
+        console.log(apiurl);
         const apirl = await fetch(apiurl);
         const r = await apirl.json();
+        console.log(r);
         if(r.items.length==0) return message.channel.send("No esta en vivo ahora...");
         startime = r.items[0].liveStreamingDetails.actualStartTime;
         utc = new Date().toISOString();

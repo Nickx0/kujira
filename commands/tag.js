@@ -59,6 +59,10 @@ module.exports = {
         tagTime = ((result/1000).toFixed())-offset;
         try {
             await Url.insertOne(query);
+            Url.updateOne(
+                { _id: `${urlvideos[0].id_video}` },
+                { $push: { tag: `${tag}`,segundo:`${tagTime}` } }
+        )
         } catch (error) {
             Url.updateOne(
                 { _id: `${urlvideos[0].id_video}` },

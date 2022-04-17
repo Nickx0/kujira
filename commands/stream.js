@@ -2,6 +2,7 @@ const Discord = require("discord.js");
 const fetch = require("node-fetch");
 const config = require("../config");
 const apikey = config.apikey;
+const pool = require('../db-connection.js');
 var {vtuberlist,yTlives} = require('../lives.js');
 
 function verifyURL(url) {
@@ -68,14 +69,14 @@ module.exports = {
                 description: "URL INVALIDA"
             }})
         };
-        let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet,liveStreamingDetails,contentDetails&fields=items(snippet(title,channelTitle,liveBroadcastContent),liveStreamingDetails(scheduledStartTime,concurrentViewers),statistics(viewCount),contentDetails(duration))&id="+IdUrl+"&key="+apikey;
+        let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet,liveStreamingDetails,contentDetails&fields=items(snippet(title,channelTitle,liveBroadcastContent),liveStreamingDetails(scheduledStartTime,concurrentViewers),statistics(viewCount),contentDetails(duration))&id="+idVideo+"&key="+apikey;
         //Json FIle Api to object
         const apirl = await fetch(apiurl);
         const r = await apirl.json();
         let stat=(r.items[0].snippet.liveBroadcastContent==="live")? "En Vivo":(r.items[0].snippet.liveBroadcastContent==="none")?"Finalizado":"En Espera";
         console.log(stat);
-        let img = "https://img.youtube.com/vi/"+IdUrl+"/maxresdefault.jpg";
-        let ltimg = "https://img.youtube.com/vi/"+IdUrl+"/mqdefault.jpg";
+        let img = "https://img.youtube.com/vi/"+idVideo+"/maxresdefault.jpg";
+        let ltimg = "https://img.youtube.com/vi/"+idVideo+"/mqdefault.jpg";
         var view = "???",timestr;
         if(stat==="Finalizado"){
             let time = r.items[0].contentDetails.duration;
@@ -100,13 +101,15 @@ module.exports = {
                 { name: 'Viewers', value: `${view}`, inline: true },
             )
             .setTimestamp()
-            .setURL("https://www.youtube.com/watch?v="+IdUrl)
+            .setURL("https://www.youtube.com/watch?v="+idVideo)
         message.channel.send(embed);
     } catch(err) {
+        console.log(err)   
      message.channel.send({embed: {
       color: 16734039,
       description: "Something went wrong... :cry:"
-     }})
+     }}
+     )
     }
    })();
   }
