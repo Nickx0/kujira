@@ -27,7 +27,7 @@ module.exports = {
         let key = await pool.query(callvtuberkey);
         if(key.length!==1) return message.channel.send("Opcion no disponible en este canal");
         console.log(key);
-        let selId_vtuber = `SELECT * FROM Pjt3W34Qzv.video WHERE id_vtuber='${key[0].id_vtuber}' and estado=1`
+        let selId_vtuber = `SELECT * FROM Pjt3W34Qzv.video WHERE id_vtuber='${key[0].id_vtuber}' and estado=1 ORDER BY id_videos DESC`
         let urlvideos = await pool.query(selId_vtuber);
         if(urlvideos.length===0) return message.channel.send("No esta en vivo ahora...");
         let apiurl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&fields=items(snippet(title,liveBroadcastContent),liveStreamingDetails(actualStartTime))&id="+urlvideos[0].id_video+"&key="+apikey;
