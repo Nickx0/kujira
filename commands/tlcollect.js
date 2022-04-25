@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const fetch = require("node-fetch");
 const pool = require('../db-connection.js');
 const { LiveChat } = require("youtube-chat")
+var {yTlives,yTlchat} = require('../lives.js');
 const tlTextES = /^\[es\]|\[esp\]|\(es\)\(esp\)$/
 const tlTextEN= /^\[en\]|\(en\)$/
 const tlTextJP = /^\[jp\]|\(jp\)$/
@@ -22,11 +23,24 @@ module.exports = {
         Where a.canal_alerta_key = '${channel}'`;
         let yTchannel = await pool.query(query);
         if(yTchannel.length!==1) return message.channel.send("Opcion no disponible en este canal");
-        const liveChat = new LiveChat({channelId: yTchannel[0].channelid})
+        if(yTlchat.length!==0){
+          let lchat = yTlchat.findIndex(lchat => lchat.channelid == yTchannel[0].channelid);
+          if(lchat!== -1){
+            let live = yTlives.findIndex(ytlive => ytlive.id.channelId == yTchannel[0].channelid);
+            if(live!==-1){
+              if(yTlchat[lchat].livechat.liveId===yTlives[live].liveId){
+                console.log(`TL: Ch: ${yTlchat[lchat].channelid} Id: ${yTlchat[lchat].livechat.liveId}`)
+                return message.channel.send('El TLcollector ya está activo en este canal!!')
+              }
+            }
+          }
+        }
+        let liveChat = new LiveChat({channelId: yTchannel[0].channelid})
         query = `SELECT e.logo_dc,v.channelid FROM Pjt3W34Qzv.empresa e 
         inner join Pjt3W34Qzv.vtuberlist v on v.id_empresa=e.id_empresa`;
         let channelids = await pool.query(query);
         liveChat.on("start", (liveId) => {
+          console.log(`TL: Ch: ${yTchannel[0].channelid} Id: ${liveId}`)
           message.channel.send('Listo para recoger las traducciones!')
         })
         liveChat.on("chat", (chatItem) => {
@@ -65,8 +79,7 @@ module.exports = {
         })
 
         liveChat.on("end", (reason) => {
-          message.channel.send("El directo ha finalizado")
-          liveChat.stop()
+          //message.channel.send("El directo ha finalizado")
         })
 
         liveChat.on("error", (err) => {
@@ -75,8 +88,15 @@ module.exports = {
         const ok = await liveChat.start()
         if (!ok) {
           console.log("Failed to start, check emitted error")
+        }else{
+            let lchat = yTlchat.find(lchat => lchat.channelid === yTchannel[0].channelid)
+            if(lchat!==-1){
+              let ylchat = yTlchat.splice(lchat,1,{channelid:yTchannel[0].channelid,livechat:liveChat})
+              ylchat[0].stop('')
+            }else{
+              yTlchat.push({channelid:yTchannel[0].channelid,livechat:liveChat})
+            }
         }
-
     } catch (err) {
         console.log(err);
     }

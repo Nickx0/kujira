@@ -1,4 +1,4 @@
 var vtuberlist = Array();
 var yTlives = Array();
-module.exports = {vtuberlist};
-module.exports = {yTlives};
+var yTlchat = Array();
+module.exports = {vtuberlist,yTlives,yTlchat};
