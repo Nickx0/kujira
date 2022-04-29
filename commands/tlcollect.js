@@ -92,7 +92,7 @@ module.exports = {
             let lchat = yTlchat.find(lchat => lchat.channelid === yTchannel[0].channelid)
             if(lchat!==-1){
               let ylchat = yTlchat.splice(lchat,1,{channelid:yTchannel[0].channelid,livechat:liveChat})
-              ylchat[0].stop('')
+              ylchat[0].livechat.stop('')
             }else{
               yTlchat.push({channelid:yTchannel[0].channelid,livechat:liveChat})
             }
