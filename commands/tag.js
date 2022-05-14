@@ -69,7 +69,11 @@ module.exports = {
                 { $push: { tag: `${tag}`,segundo:`${tagTime}` } }
         )
         }
-        message.react('👌');
+        try {
+            message.react('👌').catch(() => message.reply("👌"));
+        } catch (error) {
+            
+        }
     } catch (err) {
         console.log(err);
     }

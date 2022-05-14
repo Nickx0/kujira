@@ -79,7 +79,7 @@ module.exports = {
         })
 
         liveChat.on("end", (reason) => {
-          //message.channel.send("El directo ha finalizado")
+          message.channel.send("El directo ha finalizado")
         })
 
         liveChat.on("error", (err) => {
@@ -92,7 +92,7 @@ module.exports = {
             let lchat = yTlchat.find(lchat => lchat.channelid === yTchannel[0].channelid)
             if(lchat!==-1){
               let ylchat = yTlchat.splice(lchat,1,{channelid:yTchannel[0].channelid,livechat:liveChat})
-              ylchat[0].livechat.stop('')
+              ylchat[0].stop('')
             }else{
               yTlchat.push({channelid:yTchannel[0].channelid,livechat:liveChat})
             }

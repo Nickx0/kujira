@@ -366,7 +366,7 @@ async function sleep(ms) {
   
   async function existLivedb(live){
     list = await pool.query(`SELECT * FROM Pjt3W34Qzv.video WHERE id_video='${live}'`);
-    return (list.length>=1)
+    return (list.length!=0)
 }
 
 function loadVTObjects(vtuberlist){

@@ -50,7 +50,11 @@ module.exports = {
             { $set: { "segundo.$" : secondsOfNewTag ,
                     "tag.$":Tag } }        
         )
-        message.react('👍');
+        try {
+            message.react('👍').catch(() => message.reply("👍"));
+        } catch (error) {
+            
+        }
     } catch (err) {
         console.log(err);
     }
