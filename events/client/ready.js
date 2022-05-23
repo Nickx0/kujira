@@ -7,7 +7,6 @@ const { JSDOM } = jsdom;
 const got = require("got");
 const pool = require('../../db-connection.js');
 const {YTLive} = require("../../YTlive/YTlive");
-const { data } = require("cheerio/lib/api/attributes.js");
 /*var lastIdUrl;
 async function getLastId(urlx){
     let urs = "https://www.youtube.com/feeds/videos.xml?channel_id="+urlx;
@@ -319,7 +318,7 @@ async function checkTwitchLives(){
           console.log(`TLIVE: ${vtuber.nombre}`)
         }
       }
-    }, 20000); 
+    }, 60000); 
   } catch(err) {
     console.log(err);
   }
